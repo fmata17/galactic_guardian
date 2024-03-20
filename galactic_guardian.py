@@ -48,6 +48,8 @@ class GalacticGuardian:
             self.spaceship.moving_right = True
         elif event.key == pygame.K_LEFT:
             self.spaceship.moving_left = True
+        elif event.key == pygame.K_q:
+            self.running = False
 
     def _check_keyup_events(self, event):
         """Respond to key releases."""
