@@ -8,4 +8,4 @@ class Settings:
         self.bg_color = (54, 1, 63)
 
         # ship settings
-        self.spaceship_speed = 5.5
+        self.spaceship_speed = 5

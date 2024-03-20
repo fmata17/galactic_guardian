@@ -26,9 +26,11 @@ class Spaceship:
 
     def update_position(self):
         """Update the spaceship's position depending on the movement flags."""
-        if self.moving_right:
+        # update the ship's x value, not the rect
+        # limit the ship's movement to stay inside the screen
+        if self.moving_right and self.rect.right < self.screen_rect.right:
             self.x += self.settings.spaceship_speed
-        if self.moving_left:
+        if self.moving_left and self.rect.left > 0:
             self.x -= self.settings.spaceship_speed
 
         # update the rect object from self.x
