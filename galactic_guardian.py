@@ -1,4 +1,3 @@
-import sys
 import pygame
 from settings import Settings
 from spaceship import Spaceship
@@ -13,6 +12,7 @@ class GalacticGuardian:
         Initialize the game settings for this module.
         """
         pygame.init()
+        self.running = True
         self.clock = pygame.time.Clock()
         self.settings = Settings()
 
@@ -23,18 +23,30 @@ class GalacticGuardian:
 
     def run_game(self):
         """Start the main loop for the game to run continuously."""
-        while True:
+        while self.running:
             self._check_events()
+            self.spaceship.update_position()
             self._update_screen()
             # defines the frame rate so that the clock can make the loop run this many times per second
             self.clock.tick(60)
 
-    @staticmethod
-    def _check_events():
+    def _check_events(self):
         """Watches for keyboard and mouse events."""
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                sys.exit()
+                self.running = False
+
+            # move spaceship to the right and left
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RIGHT:
+                    self.spaceship.moving_right = True
+                elif event.key == pygame.K_LEFT:
+                    self.spaceship.moving_left = True
+            elif event.type == pygame.KEYUP:
+                if event.key == pygame.K_RIGHT:
+                    self.spaceship.moving_right = False
+                elif event.key == pygame.K_LEFT:
+                    self.spaceship.moving_left = False
 
     def _update_screen(self):
         """
