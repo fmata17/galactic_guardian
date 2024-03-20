@@ -24,20 +24,27 @@ class GalacticGuardian:
     def run_game(self):
         """Start the main loop for the game to run continuously."""
         while True:
-            # watches for keyboard and mouse events
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    sys.exit()
-
-            # redraws the screen each pass through the loop
-            self.screen.fill(self.settings.bg_color)
-            self.spaceship.blitme()
-
-            # makes the most recently drawn screen visible
-            pygame.display.flip()
-
+            self._check_events()
+            self._update_screen()
             # defines the frame rate so that the clock can make the loop run this many times per second
             self.clock.tick(60)
+
+    @staticmethod
+    def _check_events():
+        """Watches for keyboard and mouse events."""
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                sys.exit()
+
+    def _update_screen(self):
+        """
+        Redraws the screen each pass through the loop.
+        Makes the most recently drawn screen visible.
+        """
+        self.screen.fill(self.settings.bg_color)
+        self.spaceship.blitme()
+
+        pygame.display.flip()
 
 
 if __name__ == "__main__":
