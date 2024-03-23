@@ -1,6 +1,7 @@
 import pygame
 from settings import Settings
 from spaceship import Spaceship
+from bullet import Bullet
 
 
 class GalacticGuardian:
@@ -20,12 +21,14 @@ class GalacticGuardian:
         pygame.display.set_caption("Galactic Guardian")
 
         self.spaceship = Spaceship(self)
+        self.bullet = pygame.sprite.Group()
 
     def run_game(self):
         """Start the main loop for the game to run continuously."""
         while self.running:
             self._check_events()
-            self.spaceship.update_position()
+            self.spaceship.update()
+            self.bullet.update()
             self._update_screen()
             # defines the frame rate so that the clock can make the loop run this many times per second
             self.clock.tick(60)
