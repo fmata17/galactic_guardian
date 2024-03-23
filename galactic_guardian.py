@@ -28,14 +28,7 @@ class GalacticGuardian:
         while self.running:
             self._check_events()
             self.spaceship.update()
-            self.bullets.update()
-
-            # get rid of bullets outside the screen limit
-            # use a copy because a for loop does not expect changes in the input while running
-            for bullet in self.bullets.copy():
-                if bullet.rect.bottom <= 0:
-                    self.bullets.remove(bullet)
-
+            self._update_bullets()
             self._update_screen()
             # defines the frame rate so that the clock can make the loop run this many times per second
             self.clock.tick(60)
@@ -76,6 +69,14 @@ class GalacticGuardian:
             new_bullet = Bullet(self)
             # noinspection PyTypeChecker
             self.bullets.add(new_bullet)
+
+    def _update_bullets(self):
+        """Updates position of bullets and gets rid of old ones past the screen limit."""
+        self.bullets.update()
+        # use a copy because a for loop does not expect changes in the input while running
+        for bullet in self.bullets.copy():
+            if bullet.rect.bottom <= 0:
+                self.bullets.remove(bullet)
 
     def _update_screen(self):
         """
