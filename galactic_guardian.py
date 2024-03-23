@@ -73,6 +73,7 @@ class GalacticGuardian:
     def _fire_bullet(self):
         """Creates a new bullet and adds it to the bullets group."""
         new_bullet = Bullet(self)
+        # noinspection PyTypeChecker
         self.bullets.add(new_bullet)
 
     def _update_screen(self):
