@@ -61,7 +61,7 @@ class GalacticGuardian:
     def _update_screen(self):
         """
         Redraws the screen each pass through the loop.
-        Makes the most recently drawn screen visible.
+        Makes the most recently drawn screen visible on the screen rect.
         """
         self.screen.fill(self.settings.bg_color)
         self.spaceship.blitme()
