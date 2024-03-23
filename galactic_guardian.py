@@ -71,10 +71,11 @@ class GalacticGuardian:
             self.spaceship.moving_left = False
 
     def _fire_bullet(self):
-        """Creates a new bullet and adds it to the bullets group."""
-        new_bullet = Bullet(self)
-        # noinspection PyTypeChecker
-        self.bullets.add(new_bullet)
+        """Creates a new bullet and adds it to the bullets group while only allowing three at the time."""
+        if len(self.bullets) < self.settings.bullets_allowed:
+            new_bullet = Bullet(self)
+            # noinspection PyTypeChecker
+            self.bullets.add(new_bullet)
 
     def _update_screen(self):
         """
