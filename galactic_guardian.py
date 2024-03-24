@@ -51,7 +51,7 @@ class GalacticGuardian:
             self.spaceship.moving_right = True
         elif event.key == pygame.K_LEFT:
             self.spaceship.moving_left = True
-        elif event.key == pygame.K_q:
+        elif event.key == pygame.K_q or event.key == pygame.K_ESCAPE:
             self.running = False
         elif event.key == pygame.K_SPACE:
             self._fire_bullet()
