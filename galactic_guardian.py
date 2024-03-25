@@ -1,4 +1,5 @@
 import pygame
+import sys
 from settings import Settings
 from spaceship import Spaceship
 from bullet import Bullet
@@ -36,6 +37,8 @@ class GalacticGuardian:
             self._update_screen()
             # defines the frame rate so that the clock can make the loop run this many times per second
             self.clock.tick(60)
+        pygame.quit()
+        sys.exit()
 
     def _check_events(self):
         """Watches for keyboard and mouse events."""
