@@ -2,6 +2,7 @@ import pygame
 from settings import Settings
 from spaceship import Spaceship
 from bullet import Bullet
+from alien import Alien
 
 
 class GalacticGuardian:
@@ -22,6 +23,9 @@ class GalacticGuardian:
 
         self.spaceship = Spaceship(self)
         self.bullets = pygame.sprite.Group()
+        self.aliens = pygame.sprite.Group()
+
+        self._create_fleet()
 
     def run_game(self):
         """Start the main loop for the game to run continuously."""
@@ -78,6 +82,13 @@ class GalacticGuardian:
             if bullet.rect.bottom <= 0:
                 self.bullets.remove(bullet)
 
+    def _create_fleet(self):
+        """Creates a new fleet of aliens"""
+        # make an alien
+        alien = Alien(self)
+        # noinspection PyTypeChecker
+        self.aliens.add(alien)
+
     def _update_screen(self):
         """
         Redraws the screen each pass through the loop.
@@ -87,6 +98,7 @@ class GalacticGuardian:
         for bullet in self.bullets.sprites():
             bullet.draw_bullet()
         self.spaceship.blitme()
+        self.aliens.draw(self.screen)
 
         pygame.display.flip()
 
