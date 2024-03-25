@@ -13,7 +13,7 @@ class Alien(Sprite):
         self.image = pygame.image.load('images/alien.bmp')
         self.rect = self.image.get_rect()
 
-        # start each new alien at the top left of the screen
+        # start each new alien at the top left of the screen with appropriate margins
         self.rect.x = self.rect.width
         self.rect.y = self.rect.height
 

@@ -3,15 +3,15 @@ class Settings:
     def __init__(self):
         """Initializes the game's settings for other modules."""
         # screen settings
-        self.screen_width = 1200
+        self.screen_width = 1350
         self.screen_height = 800
         self.bg_color = (54, 1, 63)
 
         # ship settings
-        self.spaceship_speed = 2.0
+        self.spaceship_speed = 4.0
 
         # bullet settings
-        self.bullet_speed = 5.0
+        self.bullet_speed = 8.0
         self.bullet_width = 3
         self.bullet_height = 15
         self.bullet_color = (60, 60, 60)

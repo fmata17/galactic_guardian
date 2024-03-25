@@ -15,7 +15,7 @@ class Spaceship:
         self.rect = self.image.get_rect()
 
         # starts each new ship at the bottom center of the screen
-        self.rect.midbottom = self.screen_rect.midbottom
+        self.rect.midbottom = (self.screen_rect.midbottom[0], (self.screen_rect.midbottom[1] - 10))
 
         # store a float for the ships exact horizontal position because if not specified, rect object only run integers
         self.x = float(self.rect.x)
