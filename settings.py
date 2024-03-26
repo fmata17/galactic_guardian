@@ -3,7 +3,7 @@ class Settings:
     def __init__(self):
         """Initializes the game's settings for other modules."""
         # screen settings
-        self.screen_width = 1350
+        self.screen_width = 1650
         self.screen_height = 800
         self.bg_color = (54, 1, 63)
 
@@ -15,4 +15,4 @@ class Settings:
         self.bullet_width = 3
         self.bullet_height = 15
         self.bullet_color = (60, 60, 60)
-        self.bullets_allowed = 3
+        self.bullets_allowed = 5
