@@ -34,6 +34,7 @@ class GalacticGuardian:
             self._check_events()
             self.spaceship.update()
             self._update_bullets()
+            self._update_aliens()
             self._update_screen()
             # defines the frame rate so that the clock can make the loop run this many times per second
             self.clock.tick(60)
@@ -84,6 +85,10 @@ class GalacticGuardian:
         for bullet in self.bullets.copy():
             if bullet.rect.bottom <= 0:
                 self.bullets.remove(bullet)
+
+    def _update_aliens(self):
+        """Updates position of all aliens in the fleet."""
+        self.aliens.update()
 
     def _create_fleet(self):
         """Creates a new fleet of aliens"""
