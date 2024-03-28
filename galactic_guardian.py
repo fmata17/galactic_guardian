@@ -113,8 +113,22 @@ class GalacticGuardian:
             current_y += 2 * alien_height
 
     def _update_fleet(self):
-        """Updates position of all aliens in the fleet."""
+        """Check if the fleet is at an edge, then updates position of all aliens in the fleet."""
+        self._check_fleet_edges()
         self.aliens.update()
+
+    def _check_fleet_edges(self):
+        """Checks if the fleet has hit the left or right border of the screen and responds appropriately."""
+        for alien in self.aliens.sprites():
+            if alien.check_edges():
+                self._change_fleet_direction()
+                break
+
+    def _change_fleet_direction(self):
+        """Changes the fleet direction and drops the fleet."""
+        for alien in self.aliens.sprites():
+            alien.rect.y += self.settings.fleet_drop_speed
+        self.settings.fleet_direction *= -1
 
     def _update_screen(self):
         """
