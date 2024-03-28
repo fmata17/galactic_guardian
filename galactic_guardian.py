@@ -86,9 +86,14 @@ class GalacticGuardian:
             if bullet.rect.bottom <= 0:
                 self.bullets.remove(bullet)
 
-    def _update_fleet(self):
-        """Updates position of all aliens in the fleet."""
-        self.aliens.update()
+    def _create_alien(self, x_position, y_position):
+        """Creates a new alien and places it in the fleet."""
+        new_alien = Alien(self)
+        new_alien.x = x_position
+        new_alien.rect.x = x_position
+        new_alien.rect.y = y_position
+        # noinspection PyTypeChecker
+        self.aliens.add(new_alien)
 
     def _create_fleet(self):
         """Creates a new fleet of aliens"""
@@ -107,14 +112,9 @@ class GalacticGuardian:
             current_x = alien_width
             current_y += 2 * alien_height
 
-    def _create_alien(self, x_position, y_position):
-        """Creates a new alien and places it in the fleet."""
-        new_alien = Alien(self)
-        new_alien.x = x_position
-        new_alien.rect.x = x_position
-        new_alien.rect.y = y_position
-        # noinspection PyTypeChecker
-        self.aliens.add(new_alien)
+    def _update_fleet(self):
+        """Updates position of all aliens in the fleet."""
+        self.aliens.update()
 
     def _update_screen(self):
         """
