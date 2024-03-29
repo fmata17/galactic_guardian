@@ -7,8 +7,9 @@ class Settings:
         self.screen_height = 800
         self.bg_color = (54, 1, 63)
 
-        # ship settings
+        # spaceship settings
         self.spaceship_speed = 4.0
+        self.spaceship_limit = 3
 
         # bullet settings
         self.bullet_speed = 5.0

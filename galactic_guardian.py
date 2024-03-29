@@ -129,6 +129,9 @@ class GalacticGuardian:
         self._check_fleet_edges()
         self.aliens.update()
 
+        if pygame.sprite.spritecollideany(self.spaceship, self.aliens):
+            print("Ship hit!!!")
+
     def _check_fleet_edges(self):
         """Checks if the fleet has hit the left or right border of the screen and responds appropriately."""
         for alien in self.aliens.sprites():
