@@ -89,6 +89,11 @@ class GalacticGuardian:
         # check for any bullets that have hit an alien and get rid of both, the bullet and alien
         pygame.sprite.groupcollide(self.bullets, self.aliens, True, True)
 
+        if not self.aliens:
+            # destroy existing bullets and create new fleet
+            self.bullets.empty()
+            self._create_fleet()
+
     def _create_alien(self, x_position, y_position):
         """Creates a new alien and places it in the fleet."""
         new_alien = Alien(self)
