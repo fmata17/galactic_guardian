@@ -86,6 +86,9 @@ class GalacticGuardian:
             if bullet.rect.bottom <= 0:
                 self.bullets.remove(bullet)
 
+        # check for any bullets that have hit an alien and get rid of both, the bullet and alien
+        pygame.sprite.groupcollide(self.bullets, self.aliens, True, True)
+
     def _create_alien(self, x_position, y_position):
         """Creates a new alien and places it in the fleet."""
         new_alien = Alien(self)
@@ -97,7 +100,7 @@ class GalacticGuardian:
 
     def _create_fleet(self):
         """Creates a new fleet of aliens"""
-        # make an alien and keep adding aliens until there is no more room
+        # make an alien and keep adding aliens until there is no more room in the screen
         # leave one alien's space above and next to each alien
         alien = Alien(self)
         alien_width, alien_height = alien.rect.size
