@@ -18,6 +18,7 @@ class GalacticGuardian:
         """
         pygame.init()
         self.running = True
+        self.active_gameplay = True
         self.clock = pygame.time.Clock()
         self.settings = Settings()
 
@@ -36,9 +37,12 @@ class GalacticGuardian:
         """Start the main loop for the game to run continuously."""
         while self.running:
             self._check_events()
-            self.spaceship.update()
-            self._update_bullets()
-            self._update_fleet()
+
+            if self.active_gameplay:
+                self.spaceship.update()
+                self._update_bullets()
+                self._update_fleet()
+
             self._update_screen()
             # defines the frame rate so that the clock can make the loop run this many times per second
             self.clock.tick(60)
@@ -156,7 +160,7 @@ class GalacticGuardian:
             # pause
             sleep(0.5)
         else:
-            self.running = False
+            self.active_gameplay = False
 
     def _check_fleet_edges(self):
         """Checks if the fleet has hit the left or right border of the screen and responds appropriately."""
