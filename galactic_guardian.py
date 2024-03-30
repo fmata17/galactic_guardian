@@ -1,6 +1,8 @@
 import pygame
 import sys
+from time import sleep
 from settings import Settings
+from game_stats import GameStats
 from spaceship import Spaceship
 from bullet import Bullet
 from alien import Alien
@@ -21,6 +23,8 @@ class GalacticGuardian:
 
         self.screen = pygame.display.set_mode((self.settings.screen_width, self.settings.screen_height))
         pygame.display.set_caption("Galactic Guardian")
+
+        self.stats = GameStats(self)
 
         self.spaceship = Spaceship(self)
         self.bullets = pygame.sprite.Group()
@@ -130,7 +134,23 @@ class GalacticGuardian:
         self.aliens.update()
 
         if pygame.sprite.spritecollideany(self.spaceship, self.aliens):
-            print("Ship hit!!!")
+            self._ship_hit()
+
+    def _ship_hit(self):
+        """Responds to the spaceship being hit by an alien."""
+        # subtract one ship to current statistic
+        self.stats.ships_left -= 1
+
+        # empty bullets and aliens from screen
+        self.bullets.empty()
+        self.aliens.empty()
+
+        # create new fleet and center the ship
+        self._create_fleet()
+        self.spaceship.center_ship()
+
+        # pause
+        sleep(0.5)
 
     def _check_fleet_edges(self):
         """Checks if the fleet has hit the left or right border of the screen and responds appropriately."""
