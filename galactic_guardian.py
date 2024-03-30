@@ -136,27 +136,41 @@ class GalacticGuardian:
         if pygame.sprite.spritecollideany(self.spaceship, self.aliens):
             self._ship_hit()
 
+        # look for aliens hitting the bottom of the screen
+        self._check_alien_bottom()
+
     def _ship_hit(self):
         """Responds to the spaceship being hit by an alien."""
-        # subtract one ship to current statistic
-        self.stats.spaceships_left -= 1
+        if self.stats.spaceships_left > 0:
+            # subtract one ship to current statistic
+            self.stats.spaceships_left -= 1
 
-        # empty bullets and aliens from screen
-        self.bullets.empty()
-        self.aliens.empty()
+            # empty bullets and aliens from screen
+            self.bullets.empty()
+            self.aliens.empty()
 
-        # create new fleet and center the ship
-        self._create_fleet()
-        self.spaceship.center_spaceship()
+            # create new fleet and center the ship
+            self._create_fleet()
+            self.spaceship.center_spaceship()
 
-        # pause
-        sleep(0.5)
+            # pause
+            sleep(0.5)
+        else:
+            self.running = False
 
     def _check_fleet_edges(self):
         """Checks if the fleet has hit the left or right border of the screen and responds appropriately."""
         for alien in self.aliens.sprites():
             if alien.check_edges():
                 self._change_fleet_direction()
+                break
+
+    def _check_alien_bottom(self):
+        """Checks if any alien from the fleet has hit the bottom of the screen."""
+        for alien in self.aliens.sprites():
+            if alien.rect.bottom >= self.settings.screen_height:
+                # treat this event the same way as if the ship got hit
+                self._ship_hit()
                 break
 
     def _change_fleet_direction(self):
