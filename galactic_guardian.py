@@ -147,7 +147,7 @@ class GalacticGuardian:
 
         # create new fleet and center the ship
         self._create_fleet()
-        self.spaceship.center_ship()
+        self.spaceship.center_spaceship()
 
         # pause
         sleep(0.5)
