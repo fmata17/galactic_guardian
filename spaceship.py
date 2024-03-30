@@ -26,7 +26,7 @@ class Spaceship:
 
     def center_spaceship(self):
         """Center the spaceship on the screen."""
-        self.rect.midbottom = self.screen_rect.midbottom
+        self.rect.midbottom = (self.screen_rect.midbottom[0], (self.screen_rect.midbottom[1] - 10))
         self.x = float(self.rect.x)
 
     def update(self):
