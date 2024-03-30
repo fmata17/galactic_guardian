@@ -3,6 +3,7 @@ import sys
 from time import sleep
 from settings import Settings
 from game_stats import GameStats
+from button import Button
 from spaceship import Spaceship
 from bullet import Bullet
 from alien import Alien
@@ -32,6 +33,9 @@ class GalacticGuardian:
         self.aliens = pygame.sprite.Group()
 
         self._create_fleet()
+
+        # make plat button
+        self.play_button = Button(self, "Play")
 
     def run_game(self):
         """Start the main loop for the game to run continuously."""
@@ -193,6 +197,10 @@ class GalacticGuardian:
             bullet.draw_bullet()
         self.spaceship.blitme()
         self.aliens.draw(self.screen)
+
+        # draw the play button if gameplay is inactive
+        if not self.active_gameplay:
+            self.play_button.draw_button()
 
         pygame.display.flip()
 
