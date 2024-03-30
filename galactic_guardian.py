@@ -73,7 +73,16 @@ class GalacticGuardian:
     def _check_play_button(self, mouse_pos):
         """Checks if the play button has been clicked"""
         if self.play_button.rect.collidepoint(mouse_pos):
+            self.stats.reset_stats()
             self.active_gameplay = True
+
+            # get rid of remaining bullets and aliens
+            self.bullets.empty()
+            self.aliens.empty()
+
+            # create new fleet and center ship
+            self._create_fleet()
+            self.spaceship.center_spaceship()
 
     def _check_keydown_events(self, event):
         """Respond to key presses."""
