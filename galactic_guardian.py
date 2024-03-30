@@ -85,6 +85,9 @@ class GalacticGuardian:
             self._create_fleet()
             self.spaceship.center_spaceship()
 
+            # hide mouse cursor
+            pygame.mouse.set_visible(False)
+
     def _check_keydown_events(self, event):
         """Respond to key presses."""
         if event.key == pygame.K_RIGHT:
