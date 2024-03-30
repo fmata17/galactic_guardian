@@ -59,11 +59,21 @@ class GalacticGuardian:
             if event.type == pygame.QUIT:
                 self.running = False
 
+            # start game at user request
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_pos = pygame.mouse.get_pos()
+                self._check_play_button(mouse_pos)
+
             # move spaceship to the right and left
             elif event.type == pygame.KEYDOWN:
                 self._check_keydown_events(event)
             elif event.type == pygame.KEYUP:
                 self._check_keyup_events(event)
+
+    def _check_play_button(self, mouse_pos):
+        """Checks if the play button has been clicked"""
+        if self.play_button.rect.collidepoint(mouse_pos):
+            self.active_gameplay = True
 
     def _check_keydown_events(self, event):
         """Respond to key presses."""
