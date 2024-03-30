@@ -139,7 +139,7 @@ class GalacticGuardian:
     def _ship_hit(self):
         """Responds to the spaceship being hit by an alien."""
         # subtract one ship to current statistic
-        self.stats.ships_left -= 1
+        self.stats.spaceships_left -= 1
 
         # empty bullets and aliens from screen
         self.bullets.empty()
