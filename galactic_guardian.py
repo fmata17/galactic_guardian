@@ -18,7 +18,7 @@ class GalacticGuardian:
         """
         pygame.init()
         self.running = True
-        self.active_gameplay = True
+        self.active_gameplay = False
         self.clock = pygame.time.Clock()
         self.settings = Settings()
 
