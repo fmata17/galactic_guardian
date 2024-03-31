@@ -188,6 +188,7 @@ class GalacticGuardian:
             sleep(0.5)
         else:
             self.active_gameplay = False
+            pygame.mouse.set_visible(True)
 
     def _check_fleet_edges(self):
         """Checks if the fleet has hit the left or right border of the screen and responds appropriately."""
