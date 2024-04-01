@@ -91,6 +91,7 @@ class GalacticGuardian:
 
     def _start_game(self):
         """Start a new game."""
+        self.settings.initialize_dynamic_settings()
         self.stats.reset_stats()
 
         # get rid of remaining bullets and aliens
@@ -139,6 +140,7 @@ class GalacticGuardian:
             # destroy existing bullets and create new fleet
             self.bullets.empty()
             self._create_fleet()
+            self.settings.increase_speed()
 
     def _create_alien(self, x_position, y_position):
         """Creates a new alien and places it in the fleet."""
