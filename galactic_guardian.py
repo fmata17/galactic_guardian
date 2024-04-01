@@ -74,19 +74,7 @@ class GalacticGuardian:
         """Checks if the play button has been clicked"""
         button_clicked = self.play_button.rect.collidepoint(mouse_pos)
         if button_clicked and not self.active_gameplay:
-            self.stats.reset_stats()
-            self.active_gameplay = True
-
-            # get rid of remaining bullets and aliens
-            self.bullets.empty()
-            self.aliens.empty()
-
-            # create new fleet and center ship
-            self._create_fleet()
-            self.spaceship.center_spaceship()
-
-            # hide mouse cursor
-            pygame.mouse.set_visible(False)
+            self._start_game()
 
     def _check_keydown_events(self, event):
         """Respond to key presses."""
@@ -98,6 +86,25 @@ class GalacticGuardian:
             self.running = False
         elif event.key == pygame.K_SPACE:
             self._fire_bullet()
+        elif event.key == pygame.K_p and not self.active_gameplay:
+            self._start_game()
+
+    def _start_game(self):
+        """Start a new game."""
+        self.stats.reset_stats()
+
+        # get rid of remaining bullets and aliens
+        self.bullets.empty()
+        self.aliens.empty()
+
+        # create new fleet and center ship
+        self._create_fleet()
+        self.spaceship.center_spaceship()
+
+        # hide mouse cursor
+        pygame.mouse.set_visible(False)
+
+        self.active_gameplay = True
 
     def _check_keyup_events(self, event):
         """Respond to key releases."""
