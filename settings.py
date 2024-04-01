@@ -8,7 +8,8 @@ class Settings:
         self.bg_color = (54, 1, 63)
 
         # spaceship settings
-        self.spaceship_limit = 3
+        # number of EXTRA lives from the starting one
+        self.spaceship_limit = 2
 
         # bullet settings
         self.bullet_width = 3
