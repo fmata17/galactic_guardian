@@ -12,3 +12,4 @@ class GameStats:
         """Initialize statistics that can change during the game."""
         # noinspection PyAttributeOutsideInit
         self.spaceships_left = self.settings.spaceship_limit
+        self.score = 0
