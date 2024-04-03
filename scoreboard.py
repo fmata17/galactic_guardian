@@ -26,7 +26,7 @@ class Scoreboard:
         # get rect of string image
         self.score_rect = self.score_image.get_rect()
         # display in the top right corner
-        self.score_rect.right = self.screem_rect.right - 20
+        self.score_rect.right = self.screen_rect.right - 20
         self.score_rect.top = 20
 
     def show_score(self):
