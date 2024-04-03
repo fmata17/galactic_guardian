@@ -23,6 +23,10 @@ class Settings:
         # How quickly the game speeds up
         self.speedup_scale = 1.1
 
+        # different multipliers for various starting difficulty levels
+        self.medium_scale = 2
+        self.hard_scale = 3
+
         self.initialize_dynamic_settings()
 
     def initialize_dynamic_settings(self):
@@ -44,3 +48,14 @@ class Settings:
         self.spaceship_speed *= self.speedup_scale
         self.bullet_speed *= self.speedup_scale
         self.alien_speed *= self.speedup_scale
+
+    def change_difficulty(self, difficulty):
+        """Change the starting difficulty of the game"""
+        if difficulty == "medium":
+            self.spaceship_speed *= self.medium_scale
+            self.bullet_speed *= self.medium_scale
+            self.alien_speed *= self.medium_scale
+        elif difficulty == "hard":
+            self.spaceship_speed *= self.hard_scale
+            self.bullet_speed *= self.hard_scale
+            self.alien_speed *= self.hard_scale
