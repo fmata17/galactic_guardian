@@ -29,5 +29,7 @@ class Button:
 
     def draw_button(self):
         """Draw the button on the screen and then message."""
-        self.screen.fill(self.button_color, self.rect)
+        # Draw the button with rounded edges
+        pygame.draw.rect(self.screen, self.button_color, self.rect, border_radius=20)
+        # Blit the message image to the screen
         self.screen.blit(self.msg_image, self.msg_image_rect)
