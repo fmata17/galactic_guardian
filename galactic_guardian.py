@@ -3,6 +3,7 @@ import sys
 from time import sleep
 from settings import Settings
 from game_stats import GameStats
+from scoreboard import Scoreboard
 from button import Button
 from spaceship import Spaceship
 from bullet import Bullet
@@ -27,6 +28,7 @@ class GalacticGuardian:
         pygame.display.set_caption("Galactic Guardian")
 
         self.stats = GameStats(self)
+        self.scoreboard = Scoreboard(self)
 
         self.spaceship = Spaceship(self)
         self.bullets = pygame.sprite.Group()
@@ -34,8 +36,14 @@ class GalacticGuardian:
 
         self._create_fleet()
 
-        # make plat button
-        self.play_button = Button(self, "Play")
+        # make difficulty buttons
+        self.easy_button = Button(self, "Easy")
+        self.medium_button = Button(self, "Medium")
+        self.medium_button.rect.y += 70
+        self.medium_button.msg_image_rect.y += 70
+        self.hard_button = Button(self, "Hard")
+        self.hard_button.rect.y += 140
+        self.hard_button.msg_image_rect.y += 140
 
     def run_game(self):
         """Start the main loop for the game to run continuously."""
@@ -62,7 +70,9 @@ class GalacticGuardian:
             # start game at user request
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
-                self._check_play_button(mouse_pos)
+                self._check_easy_button(mouse_pos)
+                self._check_medium_button(mouse_pos)
+                self._check_hard_button(mouse_pos)
 
             # move spaceship to the right and left
             elif event.type == pygame.KEYDOWN:
@@ -70,10 +80,27 @@ class GalacticGuardian:
             elif event.type == pygame.KEYUP:
                 self._check_keyup_events(event)
 
-    def _check_play_button(self, mouse_pos):
-        """Checks if the play button has been clicked"""
-        button_clicked = self.play_button.rect.collidepoint(mouse_pos)
+    def _check_easy_button(self, mouse_pos):
+        """Checks if the easy button has been clicked"""
+        button_clicked = self.easy_button.rect.collidepoint(mouse_pos)
         if button_clicked and not self.active_gameplay:
+            self.settings.initialize_dynamic_settings()
+            self._start_game()
+
+    def _check_medium_button(self, mouse_pos):
+        """Checks if the medium button has been clicked"""
+        button_clicked = self.medium_button.rect.collidepoint(mouse_pos)
+        if button_clicked and not self.active_gameplay:
+            self.settings.initialize_dynamic_settings()
+            self.settings.change_difficulty("medium")
+            self._start_game()
+
+    def _check_hard_button(self, mouse_pos):
+        """Checks if the hard button has been clicked"""
+        button_clicked = self.hard_button.rect.collidepoint(mouse_pos)
+        if button_clicked and not self.active_gameplay:
+            self.settings.initialize_dynamic_settings()
+            self.settings.change_difficulty("hard")
             self._start_game()
 
     def _check_keydown_events(self, event):
@@ -91,7 +118,6 @@ class GalacticGuardian:
 
     def _start_game(self):
         """Start a new game."""
-        self.settings.initialize_dynamic_settings()
         self.stats.reset_stats()
 
         # get rid of remaining bullets and aliens
@@ -231,9 +257,14 @@ class GalacticGuardian:
         self.spaceship.blitme()
         self.aliens.draw(self.screen)
 
+        # draw the scoreboard information
+        self.scoreboard.show_score()
+
         # draw the play button if gameplay is inactive
         if not self.active_gameplay:
-            self.play_button.draw_button()
+            self.easy_button.draw_button()
+            self.medium_button.draw_button()
+            self.hard_button.draw_button()
 
         pygame.display.flip()
 
