@@ -119,6 +119,7 @@ class GalacticGuardian:
     def _start_game(self):
         """Start a new game."""
         self.stats.reset_stats()
+        self.scoreboard.prep_score()
 
         # get rid of remaining bullets and aliens
         self.bullets.empty()
