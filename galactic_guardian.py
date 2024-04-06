@@ -161,10 +161,11 @@ class GalacticGuardian:
     def _check_bullet_alien_collision(self):
         """Checks if the bullets collide with the aliens and respond appropriately."""
         # check for any bullets that have hit an alien and get rid of both, the bullet and alien
-        collision = pygame.sprite.groupcollide(self.bullets, self.aliens, True, True)
+        collisions = pygame.sprite.groupcollide(self.bullets, self.aliens, True, True)
 
-        if collision:
-            self.stats.score += self.settings.alien_points
+        if collisions:
+            for aliens in collisions.values():
+                self.stats.score += self.settings.alien_points * len(aliens)
             self.scoreboard.prep_score()
 
         if not self.aliens:
