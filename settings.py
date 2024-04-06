@@ -20,8 +20,11 @@ class Settings:
         # alien settings
         self.fleet_drop_speed = 10
 
-        # How quickly the game speeds up
+        # how quickly the game speeds up
         self.speedup_scale = 1.1
+
+        # how quickly the point value of each alien increases
+        self.score_increase_scale = 1.5
 
         # different multipliers for various starting difficulty levels
         self.medium_scale = 2
@@ -47,10 +50,12 @@ class Settings:
         self.alien_points = 50
 
     def increase_speed(self):
-        """Increase speed settings."""
+        """Increase speed of gameplay and alien points."""
         self.spaceship_speed *= self.speedup_scale
         self.bullet_speed *= self.speedup_scale
         self.alien_speed *= self.speedup_scale
+
+        self.alien_points = int(self.alien_points * self.score_increase_scale)
 
     def change_difficulty(self, difficulty):
         """Change the starting difficulty of the game"""
