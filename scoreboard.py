@@ -40,8 +40,9 @@ class Scoreboard:
 
     def prep_high_score(self):
         """Make the high score a rendered image."""
-        high_score = str(self.stats.high_score)
-        self.high_score_image = self.font.render(high_score, True, self.text_color, self.settings.bg_color)
+        high_score = self.stats.high_score
+        high_score_str = f"{high_score:,}"
+        self.high_score_image = self.font.render(high_score_str, True, self.text_color, self.settings.bg_color)
 
         self.high_score_rect = self.high_score_image.get_rect()
         self.high_score_rect.centerx = self.screen_rect.centerx
