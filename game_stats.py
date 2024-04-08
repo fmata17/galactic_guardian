@@ -7,6 +7,8 @@ class GameStats:
         """Initialize statistics."""
         self.settings = gg_game.settings
         self.reset_stats()
+        # high score is here to avoid it ever being reset
+        self.high_score = 0
 
     def reset_stats(self):
         """Initialize statistics that can change during the game."""
