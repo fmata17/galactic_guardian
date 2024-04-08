@@ -19,8 +19,10 @@ class Scoreboard:
 
     def prep_score(self):
         """Turn the score into a rendered image"""
-        # turn score int to a string
-        score_str = str(self.stats.score)
+        # round the score
+        rounded_score = round(self.stats.score, -1)
+        # turn score int to a string and plug commas to separate
+        score_str = f"{rounded_score:,}"
         # turn string into image
         self.score_image = self.font.render(score_str, True, self.text_color, self.settings.bg_color)
         # get rect of string image
