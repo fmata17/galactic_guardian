@@ -26,7 +26,7 @@ class Scoreboard:
         # turn score int to a string and plug commas to separate
         score_str = f"{rounded_score:,}"
         # turn string into image
-        self.score_image = self.font.render(score_str, True, self.text_color, self.settings.bg_color)
+        self.score_image = self.font.render(score_str, True, self.text_color, None)
         # get rect of string image
         self.score_rect = self.score_image.get_rect()
         # display in the top right corner
@@ -43,7 +43,7 @@ class Scoreboard:
         """Make the high score a rendered image."""
         high_score = self.stats.high_score
         high_score_str = f"{high_score:,}"
-        self.high_score_image = self.font.render(high_score_str, True, self.text_color, self.settings.bg_color)
+        self.high_score_image = self.font.render(high_score_str, True, self.text_color, None)
 
         self.high_score_rect = self.high_score_image.get_rect()
         self.high_score_rect.centerx = self.screen_rect.centerx
@@ -53,7 +53,7 @@ class Scoreboard:
         """Turn the level int into a rendered image"""
         level = self.stats.level
         level_str = f"{level:,}"
-        self.level_image = self.font.render(level_str, True, self.text_color, self.settings.bg_color)
+        self.level_image = self.font.render(level_str, True, self.text_color, None)
 
         self.level_rect = self.level_image.get_rect()
         self.level_rect.right = self.score_rect.right
