@@ -175,6 +175,10 @@ class GalacticGuardian:
             self._create_fleet()
             self.settings.increase_speed()
 
+            # increase level
+            self.stats.level += 1
+            self.scoreboard.prep_level()
+
     def _create_alien(self, x_position, y_position):
         """Creates a new alien and places it in the fleet."""
         new_alien = Alien(self)
