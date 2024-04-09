@@ -120,6 +120,7 @@ class GalacticGuardian:
         """Start a new game."""
         self.stats.reset_stats()
         self.scoreboard.prep_score()
+        self.scoreboard.prep_level()
 
         # get rid of remaining bullets and aliens
         self.bullets.empty()
