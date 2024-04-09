@@ -121,6 +121,7 @@ class GalacticGuardian:
         self.stats.reset_stats()
         self.scoreboard.prep_score()
         self.scoreboard.prep_level()
+        self.scoreboard.prep_spaceships()
 
         # get rid of remaining bullets and aliens
         self.bullets.empty()
@@ -220,8 +221,9 @@ class GalacticGuardian:
     def _ship_hit(self):
         """Responds to the spaceship being hit by an alien."""
         if self.stats.spaceships_left > 0:
-            # subtract one ship to current statistic
+            # subtract one ship to current statistic and show it on the screen
             self.stats.spaceships_left -= 1
+            self.scoreboard.prep_spaceships()
 
             # empty bullets and aliens from screen
             self.bullets.empty()
