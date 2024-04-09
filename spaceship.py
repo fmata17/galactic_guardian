@@ -1,10 +1,12 @@
 import pygame
+from pygame.sprite import Sprite
 
 
-class Spaceship:
+class Spaceship(Sprite):
     """A class to manage the spaceship 'Moon Marauder'."""
     def __init__(self, gg_game):
         """Initialize the spaceship and its starting position."""
+        super().__init__()
         self.screen = gg_game.screen
         self.screen_rect = gg_game.screen.get_rect()
 
