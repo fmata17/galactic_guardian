@@ -15,3 +15,4 @@ class GameStats:
         # noinspection PyAttributeOutsideInit
         self.spaceships_left = self.settings.spaceship_limit
         self.score = 0
+        self.level = 1
