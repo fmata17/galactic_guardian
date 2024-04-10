@@ -15,7 +15,7 @@ class Scoreboard:
         self.stats = gg_game.stats
 
         # font setting for displaying the information
-        self.text_color = (30, 30, 30)
+        self.text_color = (0, 135, 0)
         self.font = pygame.font.SysFont(None, 60)
 
         # prep the initial score and level images
