@@ -70,8 +70,8 @@ class Scoreboard:
         for spaceship_number in range(self.stats.spaceships_left):
             spaceship = Spaceship(self.gg_game)
             spaceship.image = pygame.transform.scale(spaceship.image, (74, 50))
-            spaceship.rect.x = 20 + spaceship_number * spaceship.rect.width
-            spaceship.rect.y = 20
+            spaceship.rect.x = 10 + spaceship_number * spaceship.rect.width
+            spaceship.rect.y = 10
             self.spaceships.add(spaceship)
 
     def show_score(self):
