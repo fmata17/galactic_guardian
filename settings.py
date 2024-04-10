@@ -9,7 +9,7 @@ class Settings:
 
         # spaceship settings
         # number of EXTRA lives from the starting one
-        self.spaceship_limit = 2
+        self.spaceship_limit = 3
 
         # bullet settings
         self.bullet_width = 3

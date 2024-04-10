@@ -220,7 +220,7 @@ class GalacticGuardian:
 
     def _ship_hit(self):
         """Responds to the spaceship being hit by an alien."""
-        if self.stats.spaceships_left > 0:
+        if self.stats.spaceships_left > 1:
             # subtract one ship to current statistic and show it on the screen
             self.stats.spaceships_left -= 1
             self.scoreboard.prep_spaceships()
@@ -236,6 +236,8 @@ class GalacticGuardian:
             # pause
             sleep(0.5)
         else:
+            self.stats.spaceships_left -= 1
+            self.scoreboard.prep_spaceships()
             self.active_gameplay = False
             pygame.mouse.set_visible(True)
 
