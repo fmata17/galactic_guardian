@@ -1,6 +1,3 @@
-import json
-
-
 class GameStats:
     """Track statistics for Galactic Guardian."""
     def __init__(self, gg_game):
