@@ -28,8 +28,8 @@ class Settings:
         self.score_increase_scale = 1.5
 
         # different multipliers for various starting difficulty levels
-        self.medium_scale = 2
-        self.hard_scale = 3
+        self.medium_scale = 1.5
+        self.hard_scale = 2
 
         self.initialize_dynamic_settings()
 
