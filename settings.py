@@ -1,3 +1,4 @@
+# noinspection PyAttributeOutsideInit
 class Settings:
     """A class to define all settings for Galactic Guardian."""
     def __init__(self):
