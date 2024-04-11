@@ -35,13 +35,13 @@ class Settings:
     def initialize_dynamic_settings(self):
         """Initialize settings that will change during gameplay."""
         # spaceship settings
-        self.spaceship_speed = 4.0
+        self.spaceship_speed = 6.0
 
         # bullet settings
-        self.bullet_speed = 5.0
+        self.bullet_speed = 8.0
 
         # alien settings
-        self.alien_speed = 2.0
+        self.alien_speed = 4.0
 
         # fleet_direction of 1 represents right while -1 represents left
         self.fleet_direction = 1
