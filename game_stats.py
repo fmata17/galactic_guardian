@@ -1,4 +1,4 @@
-from settings import Settings
+import json
 
 
 class GameStats:
@@ -10,9 +10,9 @@ class GameStats:
         # high score is here to avoid it ever being reset
         self.high_score = 0
 
+    # noinspection PyAttributeOutsideInit
     def reset_stats(self):
         """Initialize statistics that can change during the game."""
-        # noinspection PyAttributeOutsideInit
         self.spaceships_left = self.settings.spaceship_limit
         self.score = 0
         self.level = 1
