@@ -1,3 +1,4 @@
+import json
 import pygame.font
 from pygame.sprite import Group
 
@@ -39,10 +40,15 @@ class Scoreboard:
         self.score_rect.top = 20
 
     def check_high_score(self):
-        """Check if the current score is bigger than the high score and respond accordingly"""
+        """
+        Check if the current score is bigger than the high score if so,
+        it saves the current score to the high score variable and json file.
+        """
         if self.stats.score > self.stats.high_score:
             self.stats.high_score = self.stats.score
             self.prep_high_score()
+            # placed this code here to avoid high score being lost by mistake or a game error
+            self._save_high_score()
 
     def prep_high_score(self):
         """Make the high score a rendered image."""
@@ -53,6 +59,11 @@ class Scoreboard:
         self.high_score_rect = self.high_score_image.get_rect()
         self.high_score_rect.centerx = self.screen_rect.centerx
         self.high_score_rect.top = 20
+
+    def _save_high_score(self):
+        """Save the high score to the respective json file."""
+        self.hs_content = json.dumps(self.stats.high_score)
+        self.stats.hs_path.write_text(self.hs_content)
 
     def prep_level(self):
         """Turn the level int into a rendered image"""
