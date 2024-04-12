@@ -48,6 +48,7 @@ class Scoreboard:
             self.stats.high_score = self.stats.score
             self.prep_high_score()
             # placed this code here to avoid high score being lost by mistake or a game error
+            # rounding does not matter before saving because it is done after being loaded again
             self._save_high_score()
 
     def prep_high_score(self):
