@@ -5,9 +5,9 @@ class Music:
     """A class to manage the game sound effects."""
     def __init__(self):
         """Initialize the music sound effects."""
-        self.laser_sound = pygame.mixer.Sound('resources/lasergun.mp3')
-        self.alien_sound = pygame.mixer.Sound('resources/alien_blast.mp3')
-        self.ship_sound = pygame.mixer.Sound('resources/ship_explosion.mp3')
+        self.laser_sound = pygame.mixer.Sound('resources/lasergun.wav')
+        self.alien_sound = pygame.mixer.Sound('resources/alien_blast.wav')
+        self.ship_sound = pygame.mixer.Sound('resources/ship_explosion.wav')
 
     def fire_laser_sfx(self):
         """Plays the laser sound."""
