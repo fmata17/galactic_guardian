@@ -25,6 +25,11 @@ class GalacticGuardian:
         self.clock = pygame.time.Clock()
         self.settings = Settings()
 
+        # music load, volume setting, and play from the beginning of the program
+        pygame.mixer.music.load("resources/stardust_danijel_zambo_background.mp3")
+        pygame.mixer.music.set_volume(0.8)
+        pygame.mixer.music.play()
+
         self.screen = pygame.display.set_mode((self.settings.screen_width, self.settings.screen_height))
         pygame.display.set_caption("Galactic Guardian")
 
