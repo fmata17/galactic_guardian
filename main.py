@@ -3,6 +3,7 @@ import pygame
 import sys
 from time import sleep
 from settings import Settings
+from music import Music
 from game_stats import GameStats
 from scoreboard import Scoreboard
 from button import Button
@@ -32,6 +33,8 @@ class GalacticGuardian:
 
         self.screen = pygame.display.set_mode((self.settings.screen_width, self.settings.screen_height))
         pygame.display.set_caption("Galactic Guardian")
+
+        self.music = Music()
 
         self.stats = GameStats(self)
         self.scoreboard = Scoreboard(self)
@@ -151,11 +154,15 @@ class GalacticGuardian:
             self.spaceship.moving_left = False
 
     def _fire_bullet(self):
-        """Creates a new bullet and adds it to the bullets group while only allowing three at the time."""
+        """
+        Creates a new bullet, adds it to the bullets group while only allowing three at the time.
+        Play laser sound effect.
+        """
         if len(self.bullets) < self.settings.bullets_allowed:
             new_bullet = Bullet(self)
             # noinspection PyTypeChecker
             self.bullets.add(new_bullet)
+            self.music.fire_laser_sfx()
 
     def _update_bullets(self):
         """Updates position of bullets and gets rid of old ones past the screen limit."""
@@ -175,6 +182,8 @@ class GalacticGuardian:
         if collisions:
             for aliens in collisions.values():
                 self.stats.score += self.settings.alien_points * len(aliens)
+                # play alien hit sound effect
+                self.music.alien_hit_sfx()
             self.scoreboard.prep_score()
             self.scoreboard.check_high_score()
 
@@ -240,11 +249,16 @@ class GalacticGuardian:
             self._create_fleet()
             self.spaceship.center_spaceship()
 
-            # pause
-            sleep(0.5)
+            # pause and play ship hit sound effect
+            self.music.ship_hit_sfx()
+            sleep(3)
         else:
             self.stats.spaceships_left -= 1
             self.scoreboard.prep_spaceships()
+
+            # play ship hit sound effect
+            self.music.ship_hit_sfx()
+
             self.active_gameplay = False
             pygame.mouse.set_visible(True)
 
