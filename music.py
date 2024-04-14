@@ -11,7 +11,7 @@ class Music:
 
     def fire_laser_sfx(self):
         """Plays the laser sound."""
-        self.laser_sound.set_volume(0.3)
+        self.laser_sound.set_volume(0.2)
         self.laser_sound.play()
 
     def alien_hit_sfx(self):
