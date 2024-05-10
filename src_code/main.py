@@ -32,7 +32,8 @@ class GalacticGuardian:
         pygame.mixer.music.set_volume(0.8)
         pygame.mixer.music.play()
 
-        self.screen = pygame.display.set_mode((self.settings.screen_width, self.settings.screen_height))
+        self.screen = pygame.display.set_mode((self.settings.screen_width,
+                                               self.settings.screen_height))
         pygame.display.set_caption("Galactic Guardian")
 
         self.music = Music()

@@ -1,11 +1,16 @@
+from screeninfo import get_monitors
+
+
 # noinspection PyAttributeOutsideInit
 class Settings:
     """A class to define all settings for Galactic Guardian."""
     def __init__(self):
         """Initializes the game's static settings for other modules."""
+        # get the screen size for each user's main monitor
+        monitor_1 = get_monitors()[0]
         # screen settings
-        self.screen_width = 1650
-        self.screen_height = 800
+        self.screen_width = monitor_1.width
+        self.screen_height = monitor_1.height
         self.bg_color = (54, 1, 63)
 
         # spaceship settings
