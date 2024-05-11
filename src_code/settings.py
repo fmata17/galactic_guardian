@@ -9,8 +9,8 @@ class Settings:
         # get the screen size for each user's main monitor
         monitor_1 = get_monitors()[0]
         # screen settings
-        self.screen_width = monitor_1.width
-        self.screen_height = monitor_1.height
+        self.screen_width = monitor_1.width - 100
+        self.screen_height = monitor_1.height - 100
         self.bg_color = (54, 1, 63)
 
         # spaceship settings

@@ -21,19 +21,19 @@ class GalacticGuardian:
         Initialize the game settings for this module.
         """
         pygame.init()
-        pygame.mixer.init()
         self.running = True
         self.active_gameplay = False
         self.clock = pygame.time.Clock()
         self.settings = Settings()
 
-        # music load, volume setting, and play from the beginning of the program
+        # load music, set volume, and play from the beginning of the program
         pygame.mixer.music.load("resources/stardust_danijel_zambo_background.wav")
         pygame.mixer.music.set_volume(0.8)
         pygame.mixer.music.play()
 
         self.screen = pygame.display.set_mode((self.settings.screen_width,
-                                               self.settings.screen_height))
+                                               self.settings.screen_height),
+                                              pygame.SCALED, vsync=1)
         pygame.display.set_caption("Galactic Guardian")
 
         self.music = Music()
