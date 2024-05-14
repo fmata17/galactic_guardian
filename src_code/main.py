@@ -31,9 +31,10 @@ class GalacticGuardian:
         pygame.mixer.music.set_volume(0.8)
         pygame.mixer.music.play()
 
+        # do not use SCALED nor vsync flags for webassembly, they are causing bugs
         self.screen = pygame.display.set_mode((self.settings.screen_width,
-                                               self.settings.screen_height),
-                                              pygame.SCALED, vsync=1)
+                                               self.settings.screen_height))
+
         pygame.display.set_caption("Galactic Guardian")
 
         self.music = Music()

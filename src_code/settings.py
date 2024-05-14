@@ -1,4 +1,4 @@
-from screeninfo import get_monitors
+import pygame
 
 
 # noinspection PyAttributeOutsideInit
@@ -7,10 +7,10 @@ class Settings:
     def __init__(self):
         """Initializes the game's static settings for other modules."""
         # get the screen size for each user's main monitor
-        monitor_1 = get_monitors()[0]
+        monitor = pygame.display.Info()
         # screen settings
-        self.screen_width = monitor_1.width - 100
-        self.screen_height = monitor_1.height - 100
+        self.screen_width = monitor.current_w
+        self.screen_height = monitor.current_h
         self.bg_color = (54, 1, 63)
 
         # spaceship settings
