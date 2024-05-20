@@ -11,7 +11,7 @@ class Alien(Sprite):
         self.settings = gg_game.settings
 
         # load the alien image and set its rect attribute
-        self.image = pygame.image.load('resources/alien.bmp')
+        self.image = pygame.image.load('resources/alien.png')
         self.rect = self.image.get_rect()
 
         # start each new alien at the top left of the screen with appropriate margins
