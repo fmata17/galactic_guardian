@@ -154,9 +154,6 @@ class GalacticGuardian:
         self._create_fleet()
         self.spaceship.center_spaceship()
 
-        # hide mouse cursor
-        pygame.mouse.set_visible(False)
-
         self.active_gameplay = True
 
     def _check_keyup_events(self, event):
