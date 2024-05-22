@@ -35,6 +35,9 @@ class GalacticGuardian:
         self.screen = pygame.display.set_mode((self.settings.screen_width,
                                                self.settings.screen_height))
 
+        self.dummy_screen = pygame.Surface((self.settings.dummy_width,
+                                            self.settings.dummy_height))
+
         pygame.display.set_caption("Galactic Guardian")
 
         self.music = Music()
@@ -60,6 +63,7 @@ class GalacticGuardian:
     async def run_game(self):
         """Start the main loop for the game to run continuously."""
         while self.running:
+            self._convert_mouse_pos()
             self._check_events()
 
             if self.active_gameplay:
@@ -74,6 +78,13 @@ class GalacticGuardian:
         pygame.quit()
         sys.exit()
 
+    def _convert_mouse_pos(self):
+        """Convert mouse position of screen to the positions on the dummy surface."""
+        scale_factor = self.screen.get_size()[0] / self.dummy_screen.get_size()[0]
+        mouse_pos = pygame.mouse.get_pos()
+        mouse_x, mouse_y = int(mouse_pos[0] / scale_factor), int(mouse_pos[1] / scale_factor)
+        self.scaled_mouse_pos = (mouse_x, mouse_y)
+
     def _check_events(self):
         """Watches for keyboard and mouse events."""
         for event in pygame.event.get():
@@ -82,10 +93,9 @@ class GalacticGuardian:
 
             # start game at user request
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                mouse_pos = pygame.mouse.get_pos()
-                self._check_easy_button(mouse_pos)
-                self._check_medium_button(mouse_pos)
-                self._check_hard_button(mouse_pos)
+                self._check_easy_button(self.scaled_mouse_pos)
+                self._check_medium_button(self.scaled_mouse_pos)
+                self._check_hard_button(self.scaled_mouse_pos)
 
             # move spaceship to the right and left
             elif event.type == pygame.KEYDOWN:
@@ -217,8 +227,8 @@ class GalacticGuardian:
         alien_width, alien_height = alien.rect.size
 
         current_x, current_y = alien_width, alien_height
-        while current_y < (self.settings.screen_height - 4 * alien_height):
-            while current_x < (self.settings.screen_width - 2 * alien_width):
+        while current_y < (self.settings.dummy_height - 4 * alien_height):
+            while current_x < (self.settings.dummy_width - 2 * alien_width):
                 self._create_alien(current_x, current_y)
                 current_x += 2 * alien_width
 
@@ -275,7 +285,7 @@ class GalacticGuardian:
     def _check_alien_bottom(self):
         """Checks if any alien from the fleet has hit the bottom of the screen."""
         for alien in self.aliens.sprites():
-            if alien.rect.bottom >= self.settings.screen_height:
+            if alien.rect.bottom >= self.settings.dummy_height:
                 # treat this event the same way as if the ship got hit
                 self._ship_hit()
                 break
@@ -290,12 +300,13 @@ class GalacticGuardian:
         """
         Redraws the screen each pass through the loop.
         Makes the most recently drawn screen visible on the screen rect.
+        Transforms and blits the dummy surface on the main screen.
         """
-        self.screen.fill(self.settings.bg_color)
+        self.dummy_screen.fill(self.settings.bg_color)
         for bullet in self.bullets.sprites():
             bullet.draw_bullet()
         self.spaceship.blitme()
-        self.aliens.draw(self.screen)
+        self.aliens.draw(self.dummy_screen)
 
         # draw the scoreboard information
         self.scoreboard.show_score()
@@ -305,6 +316,14 @@ class GalacticGuardian:
             self.easy_button.draw_button()
             self.medium_button.draw_button()
             self.hard_button.draw_button()
+
+        # scale dummy surface
+        scaled_dummy_screen = pygame.transform.scale(self.dummy_screen,
+                                                     (self.settings.screen_width,
+                                                      self.settings.screen_height))
+
+        # blit scaled surface to main surface
+        self.screen.blit(scaled_dummy_screen, (0, 0))
 
         pygame.display.flip()
 

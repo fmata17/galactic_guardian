@@ -13,6 +13,10 @@ class Settings:
         self.screen_height = monitor.current_h
         self.bg_color = (54, 1, 63)
 
+        # dummy screen settings
+        self.dummy_width = 1920
+        self.dummy_height = 1080
+
         # spaceship settings
         # number of EXTRA lives from the starting one
         self.spaceship_limit = 3

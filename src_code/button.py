@@ -5,7 +5,7 @@ class Button:
     """A class to build buttons for the game."""
     def __init__(self, gg_game, msg):
         """Initialize the button's attributes."""
-        self.screen = gg_game.screen
+        self.screen = gg_game.dummy_screen
         self.screen_rect = self.screen.get_rect()
 
         # set the dimensions and properties of the button

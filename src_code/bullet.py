@@ -7,7 +7,7 @@ class Bullet(Sprite):
     def __init__(self, gg_game):
         """Create a bullet object at the spaceship's current location."""
         super().__init__()
-        self.screen = gg_game.screen
+        self.screen = gg_game.dummy_screen
         self.settings = gg_game.settings
         self.color = gg_game.settings.bullet_color
 

@@ -10,7 +10,7 @@ class Scoreboard:
     def __init__(self, gg_game):
         """Initialize the score keeping attribute"""
         self.gg_game = gg_game
-        self.screen = gg_game.screen
+        self.screen = gg_game.dummy_screen
         self.screen_rect = self.screen.get_rect()
         self.settings = gg_game.settings
         self.stats = gg_game.stats

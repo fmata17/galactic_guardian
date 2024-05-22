@@ -7,7 +7,7 @@ class Alien(Sprite):
     def __init__(self, gg_game):
         """Initialize the alien and set its initial position."""
         super().__init__()
-        self.screen = gg_game.screen
+        self.screen = gg_game.dummy_screen
         self.settings = gg_game.settings
 
         # load the alien image and set its rect attribute

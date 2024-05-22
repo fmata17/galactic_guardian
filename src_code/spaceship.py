@@ -7,8 +7,8 @@ class Spaceship(Sprite):
     def __init__(self, gg_game):
         """Initialize the spaceship and its starting position."""
         super().__init__()
-        self.screen = gg_game.screen
-        self.screen_rect = gg_game.screen.get_rect()
+        self.screen = gg_game.dummy_screen
+        self.screen_rect = gg_game.dummy_screen.get_rect()
 
         self.settings = gg_game.settings
 
