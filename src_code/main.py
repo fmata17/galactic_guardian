@@ -33,7 +33,7 @@ class GalacticGuardian:
 
         # do not use SCALED nor vsync flags for webassembly, they are causing bugs
         self.screen = pygame.display.set_mode((self.settings.screen_width,
-                                               self.settings.screen_height))
+                                               self.settings.screen_height), pygame.FULLSCREEN)
 
         self.dummy_screen = pygame.Surface((self.settings.dummy_width,
                                             self.settings.dummy_height))
