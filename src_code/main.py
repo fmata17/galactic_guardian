@@ -323,6 +323,7 @@ class GalacticGuardian:
         self.screen.blit(scaled_dummy_screen, (0, 0))
 
         pygame.display.flip()
+# try using pygame.display.update() instead of flip to fix bug present in macbook
 
 
 if __name__ == "__main__":
