@@ -82,6 +82,8 @@ class GalacticGuardian:
         """Convert mouse position of screen to the positions on the dummy surface."""
         scale_factor_x = self.screen.get_size()[0] / self.dummy_screen.get_size()[0]
         scale_factor_y = self.screen.get_size()[1] / self.dummy_screen.get_size()[1]
+        # different scale factors for each coordinate to ensure adequate scaling even
+        # on different aspect ratios than the one of the dummy surface
         mouse_pos = pygame.mouse.get_pos()
         mouse_x = int(mouse_pos[0] / scale_factor_x)
         mouse_y = int(mouse_pos[1] / scale_factor_y)
