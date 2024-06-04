@@ -80,9 +80,11 @@ class GalacticGuardian:
 
     def _convert_mouse_pos(self):
         """Convert mouse position of screen to the positions on the dummy surface."""
-        scale_factor = self.screen.get_size()[0] / self.dummy_screen.get_size()[0]
+        scale_factor_x = self.screen.get_size()[0] / self.dummy_screen.get_size()[0]
+        scale_factor_y = self.screen.get_size()[1] / self.dummy_screen.get_size()[1]
         mouse_pos = pygame.mouse.get_pos()
-        mouse_x, mouse_y = int(mouse_pos[0] / scale_factor), int(mouse_pos[1] / scale_factor)
+        mouse_x = int(mouse_pos[0] / scale_factor_x)
+        mouse_y = int(mouse_pos[1] / scale_factor_y)
         self.scaled_mouse_pos = (mouse_x, mouse_y)
 
     def _check_events(self):
@@ -322,8 +324,7 @@ class GalacticGuardian:
         # blit scaled surface to main surface
         self.screen.blit(scaled_dummy_screen, (0, 0))
 
-        pygame.display.flip()
-# try using pygame.display.update() instead of flip to fix bug present in macbook
+        pygame.display.update()
 
 
 if __name__ == "__main__":
