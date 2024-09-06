@@ -3,3 +3,6 @@ __pycache__/
 .idea/
 gg_venv/
 build/
+
+# highscore track is individual to each computer
+highscore.json
