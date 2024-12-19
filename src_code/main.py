@@ -29,7 +29,7 @@ class GalacticGuardian:
         # load music, set volume, and play from the beginning of the program
         pygame.mixer.music.load("resources/stardust_danijel_zambo_background.ogg")
         pygame.mixer.music.set_volume(0.8)
-        pygame.mixer.music.play()
+        pygame.mixer.music.play(loops=-1)
 
         # do not use SCALED nor vsync flags for webassembly, they are causing bugs
         self.screen = pygame.display.set_mode((self.settings.screen_width,
@@ -75,6 +75,7 @@ class GalacticGuardian:
             # defines the frame rate so that the clock can make the loop run this many times per second
             self.clock.tick(60)
             await asyncio.sleep(0)
+        pygame.mixer.music.stop()
         pygame.quit()
         sys.exit()
 
@@ -169,7 +170,7 @@ class GalacticGuardian:
 
     def _fire_bullet(self):
         """
-        Creates a new bullet, adds it to the bullets group while only allowing three at the time.
+        Creates a new bullet, adds it to the bullets group while only allowing a set amount at the time.
         Play laser sound effect.
         """
         if len(self.bullets) < self.settings.bullets_allowed:
