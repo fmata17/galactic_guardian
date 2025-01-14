@@ -13,7 +13,7 @@ class Spaceship(Sprite):
         self.settings = gg_game.settings
 
         # loads ship image and gets its screen space
-        self.image = pygame.image.load('resources/spaceship.png')
+        self.image = pygame.image.load('src_code/resources/spaceship.png')
         self.rect = self.image.get_rect()
 
         # starts each new ship at the bottom center of the screen

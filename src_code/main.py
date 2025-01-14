@@ -27,7 +27,7 @@ class GalacticGuardian:
         self.settings = Settings()
 
         # load music, set volume, and play from the beginning of the program
-        pygame.mixer.music.load("resources/stardust_danijel_zambo_background.ogg")
+        pygame.mixer.music.load("src_code/resources/stardust_danijel_zambo_background.ogg")
         pygame.mixer.music.set_volume(0.8)
         pygame.mixer.music.play(loops=-1)
 
