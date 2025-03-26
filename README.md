@@ -13,4 +13,6 @@ I will make sure, through my coding journey, to provide clean code for the sake 
 
 Hope you enjoy Galactic Guardian!
 
+Game available @ https://lwkymk1.itch.io/
+
 peace out and GG - lwkymk1
