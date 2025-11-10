@@ -1,18 +1,29 @@
-# Galactic Guardian
-A python single-player game.
+# 🌌 Galactic Guardian  
+**A Python single-player arcade shooter built with Pygame**
 
-Welcome to MY WORLD!!!
+## 🚀 Overview
+**Galactic Guardian** is a simple 2D space shooter where you pilot a spaceship through waves of enemies, firing projectiles to survive.  
 
+Built in **Python** with **Pygame**, it focuses on a smooth game loop, collision handling, and structured, readable code — all written from scratch as part of my learning journey.
 
-This repository contains all the code for the game I am developing... or already developed.
+🎮 **Play it here:** [Galactic Guardian on itch.io](https://lwkymk1.itch.io)
 
+---
 
-If you are reading this you probably want to fix something or understand the code behind the game.
-I will make sure, through my coding journey, to provide clean code for the sake of any future reference.
+## 🛠️ Tech Stack
+- **Language:** Python  
+- **Library:** Pygame  
+- **Build:** WebAssembly (via pygbag)  
+- **Platform:** Browser (itch.io)
 
+---
 
-Hope you enjoy Galactic Guardian!
+## 💡 Purpose
+This game started as a personal project to understand how games are structured under the hood — from loops and physics updates to sprite management and performance.  
+I’ve kept the code clean and modular for anyone interested in exploring or modifying it.
 
-Game available @ https://lwkymk1.itch.io
+---
 
-peace out and GG - lwkymk1
+Created by **Fredy Mata** (a.k.a. *lwkymk1*)  
+
+**Peace out, and GG ✌️**
