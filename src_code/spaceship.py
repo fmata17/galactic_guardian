@@ -4,9 +4,9 @@ from pygame.sprite import Sprite
 
 class Spaceship(Sprite):
     """A class to manage the spaceship 'Moon Marauder'."""
-    def __init__(self, gg_game):
+    def __init__(self, gg_game, *groups):
         """Initialize the spaceship and its starting position."""
-        super().__init__()
+        super().__init__(*groups)
         self.screen = gg_game.dummy_screen
         self.screen_rect = gg_game.dummy_screen.get_rect()
 
@@ -41,7 +41,7 @@ class Spaceship(Sprite):
             self.x -= self.settings.spaceship_speed
 
         # update the rect object from self.x
-        self.rect.x = self.x
+        self.rect.x = int(self.x)
 
     def blitme(self):
         """Draw the spaceship at its current location."""

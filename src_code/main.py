@@ -14,6 +14,7 @@ from alien import Alien
 
 class GalacticGuardian:
     """Main class to manage game resources and conduct behavior."""
+
     def __init__(self):
         """
         Initialize the pygame module (game).
@@ -27,7 +28,8 @@ class GalacticGuardian:
         self.settings = Settings()
 
         # load music, set volume, and play from the beginning of the program
-        pygame.mixer.music.load("src_code/resources/stardust_danijel_zambo_background.ogg")
+        pygame.mixer.music.load(
+            "src_code/resources/stardust_danijel_zambo_background.ogg")
         pygame.mixer.music.set_volume(0.8)
         pygame.mixer.music.play(loops=-1)
 
@@ -81,8 +83,10 @@ class GalacticGuardian:
 
     def _convert_mouse_pos(self):
         """Convert mouse position of screen to the positions on the dummy surface."""
-        scale_factor_x = self.screen.get_size()[0] / self.dummy_screen.get_size()[0]
-        scale_factor_y = self.screen.get_size()[1] / self.dummy_screen.get_size()[1]
+        scale_factor_x = self.screen.get_size(
+        )[0] / self.dummy_screen.get_size()[0]
+        scale_factor_y = self.screen.get_size(
+        )[1] / self.dummy_screen.get_size()[1]
         # different scale factors for each coordinate to ensure adequate scaling even
         # on different aspect ratios than the one of the dummy surface
         mouse_pos = pygame.mouse.get_pos()
@@ -192,7 +196,8 @@ class GalacticGuardian:
     def _check_bullet_alien_collision(self):
         """Checks if the bullets collide with the aliens and respond appropriately."""
         # check for any bullets that have hit an alien and get rid of both, the bullet and alien
-        collisions = pygame.sprite.groupcollide(self.bullets, self.aliens, True, True)
+        collisions = pygame.sprite.groupcollide(
+            self.bullets, self.aliens, True, True)
 
         if collisions:
             for aliens in collisions.values():
@@ -243,7 +248,7 @@ class GalacticGuardian:
         self._check_fleet_edges()
         self.aliens.update()
 
-        if pygame.sprite.spritecollideany(self.spaceship, self.aliens):
+        if pygame.sprite.spritecollideany(self.spaceship, self.aliens): # type: ignore[arg-type]
             self._ship_hit()
 
         # look for aliens hitting the bottom of the screen
