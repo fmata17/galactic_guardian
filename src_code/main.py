@@ -10,6 +10,8 @@ from button import Button
 from spaceship import Spaceship
 from bullet import Bullet
 from alien import Alien
+import opik
+import inspect
 
 
 class GalacticGuardian:
@@ -42,6 +44,10 @@ class GalacticGuardian:
 
         pygame.display.set_caption("Galactic Guardian")
 
+        # initialize Opik client for logging data for RL model
+        self.client = opik.Opik()
+        # data class for RL model
+        self.data = self.GameData()
         self.music = Music()
 
         self.stats = GameStats(self)
@@ -69,9 +75,17 @@ class GalacticGuardian:
             self._check_events()
 
             if self.active_gameplay:
+                self.state = self._get_state()  # here to track state after round begins
                 self.spaceship.update()
+                # here to track actions after drawing them on screen
+                self.actions = self._get_actions()
                 self._update_bullets()
                 self._update_fleet()
+                self.next_state = self._get_state()  # here to track consequences of actions
+
+                # log data for RL model at the end of each frame
+                self.log_modeled_data(
+                    self.state, self.actions, self.next_state)
 
             self._update_screen()
             # defines the frame rate so that the clock can make the loop run this many times per second
@@ -96,6 +110,8 @@ class GalacticGuardian:
 
     def _check_events(self):
         """Watches for keyboard and mouse events."""
+        # set var to track firing to False each frame
+        self.fired_bullet = False
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
@@ -163,6 +179,11 @@ class GalacticGuardian:
         self._create_fleet()
         self.spaceship.center_spaceship()
 
+        # reset to 0 every new game
+        self.reward = 0
+        # calculate initial alien count as it can change with different screen sizes between rounds
+        self.initial_alien_count = len(self.aliens)
+
         self.active_gameplay = True
 
     def _check_keyup_events(self, event):
@@ -181,6 +202,7 @@ class GalacticGuardian:
             new_bullet = Bullet(self)
             # noinspection PyTypeChecker
             self.bullets.add(new_bullet)
+            self.fired_bullet = True
             self.music.fire_laser_sfx()
 
     def _update_bullets(self):
@@ -217,12 +239,13 @@ class GalacticGuardian:
             self.stats.level += 1
             self.scoreboard.prep_level()
 
-    def _create_alien(self, x_position, y_position):
+    def _create_alien(self, x_position, y_position, id):
         """Creates a new alien and places it in the fleet."""
         new_alien = Alien(self)
         new_alien.x = x_position
         new_alien.rect.x = x_position
         new_alien.rect.y = y_position
+        new_alien.id = id  # to track aliens' positions for model
         # noinspection PyTypeChecker
         self.aliens.add(new_alien)
 
@@ -232,11 +255,14 @@ class GalacticGuardian:
         # leave one alien's space above and next to each alien
         alien = Alien(self)
         alien_width, alien_height = alien.rect.size
+        self.aliens.add(alien)  # add the first alien to the group
+        id = 0
 
         current_x, current_y = alien_width, alien_height
         while current_y < (self.settings.dummy_height - 4 * alien_height):
             while current_x < (self.settings.dummy_width - 2 * alien_width):
-                self._create_alien(current_x, current_y)
+                id += 1
+                self._create_alien(current_x, current_y, id)
                 current_x += 2 * alien_width
 
             # finish a row; reset x value, and increment y value
@@ -248,7 +274,8 @@ class GalacticGuardian:
         self._check_fleet_edges()
         self.aliens.update()
 
-        if pygame.sprite.spritecollideany(self.spaceship, self.aliens): # type: ignore[arg-type]
+        # type: ignore[arg-type]
+        if pygame.sprite.spritecollideany(self.spaceship, self.aliens):
             self._ship_hit()
 
         # look for aliens hitting the bottom of the screen
@@ -333,6 +360,143 @@ class GalacticGuardian:
         self.screen.blit(scaled_dummy_screen, (0, 0))
 
         pygame.display.update()
+
+    def log_modeled_data(self, state, actions, next_state):
+        reward = self._get_reward(state, next_state)
+        done = float(not self.active_gameplay)
+
+        # print to console
+        self.data.add_data(state, actions, reward, next_state, done)
+        # ERASEME!!!!!!!!!!!!!!!!!!!!!!
+        message = self._build_log_message(
+            state, actions, reward, next_state, done)
+        print(message + "\n\n\n" + "="*80 + "\n\n")
+
+        # # log to Opik as a trace
+        # self.client.trace(
+        #     project_name="galactic_guardian",
+        #     name="game_output_data",
+        #     metadata=self._build_metadata(
+        #         state, actions, reward, next_state, done) or {},
+        # )
+
+    def _get_state(self):
+        # add lives remaining
+        lives = float(self.stats.spaceships_left)
+        # add screen info and aliens positions
+        ship_t = float(self.spaceship.rect.top)
+        ship_r = float(self.spaceship.rect.right)
+        ship_b = float(self.spaceship.rect.bottom)
+        ship_l = float(self.spaceship.rect.left)
+
+        aliens = []
+        # get list of alien sprites to be able to track their positions and ids
+        aliens_list = self.aliens.sprites()
+
+        for i in range(self.initial_alien_count):
+            alien = next(
+                (alien for alien in aliens_list if alien.id == i), None)
+            if alien:
+                aliens.append((float(alien.id),
+                               float(alien.rect.top),
+                               float(alien.rect.right),
+                               float(alien.rect.bottom),
+                               float(alien.rect.left)))
+            else:
+                # add killed aliens as 0s in the state to indicate their absence instead of just leaving them out
+                aliens.append((float(i), 0, 0, 0, 0))
+
+        # group coordinates together for interpretability
+        return (lives, (ship_t, ship_r, ship_b, ship_l), aliens)
+
+    def _get_actions(self):
+        # track movement and button presses separately for more accurate representation of valid in-game actions
+        pressed_r = float(pygame.key.get_pressed()[pygame.K_RIGHT])
+        moving_r = float(self.spaceship.moving_right)
+        pressed_l = float(pygame.key.get_pressed()[pygame.K_LEFT])
+        moving_l = float(self.spaceship.moving_left)
+        # track actual firing for more accurate data for the model instead of just space bar presses
+        pressed_space = float(pygame.key.get_pressed()[pygame.K_SPACE])
+        fired_laser = float(self.fired_bullet)
+        return (pressed_r, moving_r, pressed_l, moving_l, pressed_space, fired_laser)
+
+    def _get_reward(self, curr_state, next_state):  # TODO: implement a score based reward
+        if self.active_gameplay:
+            self.reward += 1  # reward survival time
+        else:
+            self.reward -= 1000  # penalize game over
+
+        death = curr_state[0] - next_state[0]
+        self.reward -= death * 100
+
+        killed = (len(curr_state[-1]) - len(next_state[-1]))
+        self.reward += killed * 25  # reward eliminations
+        return float(self.reward)
+
+    class GameData:
+        """Class to retrieve the data needed to train the RL model."""
+
+        def __init__(self) -> None:
+            self.buffer = []
+
+        def add_data(self, state, action, reward, next_state, done):
+            self.buffer.append((state, action, reward, next_state, done))
+
+    def _build_log_message(self, state, actions, reward, next_state, done):
+        log_message_pretty = inspect.cleandoc("""===== State Information =====
+                                                 \tLives: {lives}, Ship Position: {ship}
+                                                 \tAliens: {aliens}
+                                                 ===== Action Choices =====
+                                                 \tPressed Right: {p_right}, Pressed Left: {p_left}, Pressed Space: {space}
+                                                 ===== Action Consequences =====
+                                                 \tRight: {m_right}, Left: {m_left}, Fire: {fire}
+                                                 ===== Reward Received =====
+                                                 \t{reward}
+                                                 ===== Next State Information =====
+                                                 \tLives: {next_lives}, Ship Position: {next_ship}
+                                                 \tAliens: {next_aliens}
+                                                 ===== Terminal State =====
+                                                 \tDone: {done}
+                                                 """).format(lives=state[0],
+                                                             ship=state[1],
+                                                             aliens=state[2],
+                                                             p_right=True if actions[0] else False,
+                                                             m_right=True if actions[1] else False,
+                                                             p_left=True if actions[2] else False,
+                                                             m_left=True if actions[3] else False,
+                                                             space=True if actions[4] else False,
+                                                             fire=True if actions[5] else False,
+                                                             reward=reward,
+                                                             next_lives=next_state[0],
+                                                             next_ship=next_state[1],
+                                                             next_aliens=next_state[2],
+                                                             done=True if done else False)
+        return log_message_pretty
+
+    def _build_metadata(self, state, actions, reward, next_state, done):
+        metadata = {
+            "state": {
+                "lives": state[0],
+                "ship_position": state[1],
+                "aliens": state[2]
+            },
+            "actions": {
+                "right_pressed": actions[0],
+                "right_moving": actions[1],
+                "left_pressed": actions[2],
+                "left_moving": actions[3],
+                "space_pressed": actions[4],
+                "fire": actions[5]
+            },
+            "reward": reward,
+            "next_state": {
+                "lives": next_state[0],
+                "ship_position": next_state[1],
+                "aliens": next_state[2]
+            },
+            "done": done
+        }
+        return metadata
 
 
 if __name__ == "__main__":

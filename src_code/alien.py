@@ -22,6 +22,9 @@ class Alien(Sprite):
         # store the alien's exact horizontal position
         self.x = float(self.rect.x)
 
+        # give alien an id so the RL model can know its location on the grid
+        self.id = 0
+
     def check_edges(self):
         """Return True if an alien is at the edge of the screen."""
         screen_rect = self.screen.get_rect()
