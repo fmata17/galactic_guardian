@@ -1,3 +1,4 @@
+import os
 import asyncio
 import pygame
 import sys
@@ -15,12 +16,16 @@ from alien import Alien
 class GalacticGuardian:
     """Main class to manage game resources and conduct behavior."""
 
-    def __init__(self):
+    def __init__(self, mode="human"):
         """
         Initialize the pygame module (game).
         Create resources (timeframe clock, screen).
         Initialize the game settings for this module.
         """
+        self.mode = mode
+        if self.mode != "human":
+            os.environ["SDL_VIDEODRIVER"] = "dummy"
+            os.environ["SDL_AUDIODRIVER"] = "dummy"
         pygame.init()
         self.running = True
         self.active_gameplay = False
@@ -34,8 +39,11 @@ class GalacticGuardian:
         pygame.mixer.music.play(loops=-1)
 
         # do not use SCALED nor vsync flags for webassembly, they are causing bugs
-        self.screen = pygame.display.set_mode((self.settings.screen_width,
-                                               self.settings.screen_height), pygame.FULLSCREEN)
+        # dummy screen for headless mode
+        size = (self.settings.screen_width,
+                self.settings.screen_height) if self.mode == "human" else (1, 1)
+        flags = pygame.FULLSCREEN if self.mode == "human" else 0
+        self.screen = pygame.display.set_mode(size, flags)
 
         self.dummy_screen = pygame.Surface((self.settings.dummy_width,
                                             self.settings.dummy_height))
@@ -52,6 +60,8 @@ class GalacticGuardian:
         self.aliens = pygame.sprite.Group()
 
         self._create_fleet()
+        # track initial alien count for obs and reward
+        self.initial_alien_count = len(self.aliens)
 
         # make difficulty buttons
         self.easy_button = Button(self, "Easy")
@@ -80,6 +90,65 @@ class GalacticGuardian:
         pygame.mixer.music.stop()
         pygame.quit()
         sys.exit()
+
+    def tick(self):
+        """Run one tick of the game loop."""
+        if self.active_gameplay:
+            self.spaceship.update()
+            self._update_bullets()
+            self._update_fleet()
+
+            # pygame.event.pump()  # process event queue to prevent freezing
+
+            if self.mode == "human":  # not needed for headless mode
+                self._update_screen()
+
+    def act(self, action_id):
+        """Perform the action corresponding to the given action_id."""
+        if action_id == 0:  # do nothing
+            self.spaceship.moving_right = False
+            self.spaceship.moving_left = False
+        elif action_id == 1:  # move right
+            self.spaceship.moving_right = True
+            self.spaceship.moving_left = False
+        elif action_id == 2:  # move left
+            self.spaceship.moving_right = False
+            self.spaceship.moving_left = True
+        elif action_id == 3:  # fire bullet
+            self._fire_bullet()
+        elif action_id == 4:  # move right and fire bullet
+            self.spaceship.moving_right = True
+            self.spaceship.moving_left = False
+            self._fire_bullet()
+        elif action_id == 5:  # move left and fire bullet
+            self.spaceship.moving_right = False
+            self.spaceship.moving_left = True
+            self._fire_bullet()
+
+    def reset(self, difficulty="easy"):
+        """Reset the game to its initial state."""
+        self.settings.initialize_dynamic_settings()
+        if difficulty != "easy":
+            self.settings.change_difficulty(difficulty)
+        self.stats.reset_stats()
+        self.scoreboard.prep_score()
+        self.scoreboard.prep_level()
+        self.scoreboard.prep_spaceships()
+
+        # get rid of remaining bullets and aliens
+        self.bullets.empty()
+        self.aliens.empty()
+
+        # create new fleet and center ship
+        self._create_fleet()
+        # track alien count for obs and reward after reset in case it changed from the initial game
+        self.initial_alien_count = len(self.aliens)
+        self.spaceship.center_spaceship()
+
+        # avoid drift from previous frame
+        self.act(0)
+
+        self.active_gameplay = True
 
     def _convert_mouse_pos(self):
         """Convert mouse position of screen to the positions on the dummy surface."""
@@ -217,12 +286,13 @@ class GalacticGuardian:
             self.stats.level += 1
             self.scoreboard.prep_level()
 
-    def _create_alien(self, x_position, y_position):
+    def _create_alien(self, x_position, y_position, id):
         """Creates a new alien and places it in the fleet."""
         new_alien = Alien(self)
         new_alien.x = x_position
         new_alien.rect.x = x_position
         new_alien.rect.y = y_position
+        new_alien.id = id  # track alien position in the grid for the RL model
         # noinspection PyTypeChecker
         self.aliens.add(new_alien)
 
@@ -232,11 +302,14 @@ class GalacticGuardian:
         # leave one alien's space above and next to each alien
         alien = Alien(self)
         alien_width, alien_height = alien.rect.size
+        self.aliens.add(alien)  # add the first alien to the group
+        id = 0
 
         current_x, current_y = alien_width, alien_height
         while current_y < (self.settings.dummy_height - 4 * alien_height):
             while current_x < (self.settings.dummy_width - 2 * alien_width):
-                self._create_alien(current_x, current_y)
+                id += 1
+                self._create_alien(current_x, current_y, id)
                 current_x += 2 * alien_width
 
             # finish a row; reset x value, and increment y value
@@ -248,7 +321,8 @@ class GalacticGuardian:
         self._check_fleet_edges()
         self.aliens.update()
 
-        if pygame.sprite.spritecollideany(self.spaceship, self.aliens): # type: ignore[arg-type]
+        # type: ignore[arg-type]
+        if pygame.sprite.spritecollideany(self.spaceship, self.aliens):
             self._ship_hit()
 
         # look for aliens hitting the bottom of the screen
@@ -269,18 +343,20 @@ class GalacticGuardian:
             self._create_fleet()
             self.spaceship.center_spaceship()
 
-            # pause and play ship hit sound effect
-            self.music.ship_hit_sfx()
-            sleep(3)
+            if self.mode == "human":
+                # pause and play ship hit sound effect
+                self.music.ship_hit_sfx()
+                sleep(3)
         else:
             self.stats.spaceships_left -= 1
             self.scoreboard.prep_spaceships()
 
-            # play ship hit sound effect
-            self.music.ship_hit_sfx()
+            if self.mode == "human":
+                # play ship hit sound effect
+                self.music.ship_hit_sfx()
+                pygame.mouse.set_visible(True)
 
             self.active_gameplay = False
-            pygame.mouse.set_visible(True)
 
     def _check_fleet_edges(self):
         """Checks if the fleet has hit the left or right border of the screen and responds appropriately."""
