@@ -1,5 +1,5 @@
 import numpy as np
-from main import GalacticGuardian
+from src_code.main import GalacticGuardian
 # TODO implement opik for dev and testing
 
 

@@ -2,7 +2,7 @@ import json
 import pygame.font
 from pygame.sprite import Group
 
-from spaceship import Spaceship
+from src_code.spaceship import Spaceship
 
 
 class Scoreboard:
@@ -17,7 +17,7 @@ class Scoreboard:
 
         # font setting for displaying the information
         self.text_color = (0, 135, 0)
-        self.font = pygame.font.SysFont(None, 60)
+        self.font = pygame.font.SysFont("None", 60)
 
         # prep the initial score and level resources
         self.prep_score()

@@ -3,14 +3,14 @@ import asyncio
 import pygame
 import sys
 from time import sleep
-from settings import Settings
-from music import Music
-from game_stats import GameStats
-from scoreboard import Scoreboard
-from button import Button
-from spaceship import Spaceship
-from bullet import Bullet
-from alien import Alien
+from src_code.settings import Settings
+from src_code.music import Music
+from src_code.game_stats import GameStats
+from src_code.scoreboard import Scoreboard
+from src_code.button import Button
+from src_code.spaceship import Spaceship
+from src_code.bullet import Bullet
+from src_code.alien import Alien
 
 
 class GalacticGuardian:
