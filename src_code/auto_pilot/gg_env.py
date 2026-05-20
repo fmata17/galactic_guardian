@@ -1,4 +1,5 @@
 import numpy as np
+from pathlib import Path
 from src_code.main import GalacticGuardian
 # TODO implement opik for dev and testing
 
@@ -17,6 +18,13 @@ class GalacticGuardianEnv:
         self.max_level = 10
 
         self.gg_game = GalacticGuardian(mode=self.mode)
+
+        self.action_space = [0,  # do nothing
+                             1,  # move right
+                             2,  # move left
+                             3,  # fire bullet
+                             4,  # move right and fire bullet
+                             5]  # move left and fire bullet
 
     def step(self, action_id=0):
         """Take an action in the environment and return the new observation, reward, done flag, and info."""
@@ -40,12 +48,15 @@ class GalacticGuardianEnv:
             reward = self.calculate_reward(
                 observation, next_observation)  # Calculate reward
 
-            terminated = self.is_done()  # Check if game is over
+            terminated = self._is_done()  # Check if game is over
             # Check if episode is truncated
-            truncated = self.is_truncated(next_observation)
+            truncated = self._is_truncated(next_observation)
 
             # Get additional info and metadata
             info = {"step_count": self.step_count}
+            
+            # Log the environment information at regular intervals
+            self._logger(next_observation, freq=180, to_file=True)
 
             return next_observation_processed, reward, terminated, truncated, info
         else:
@@ -59,13 +70,30 @@ class GalacticGuardianEnv:
         info = {"step_count": self.step_count}
         return self.process_observation(observation), info
 
-    def is_done(self):
-        """Determine if the episode is done based on the observation."""
-        return not self.gg_game.active_gameplay
+    def calculate_reward(self, observation, next_observation):
+        """Calculate the reward based on the change in score and other factors."""
+        reward = 0
+        if not self._is_done():
+            reward += 1  # Reward for surviving each step
+        else:
+            reward -= 50  # Penalty for losing the game
+        # Loss in remaining lives (0 or 1)
+        delta_lives = observation["remaining_lives"] - \
+            next_observation["remaining_lives"]
+        # Change in score (delta_score)
+        # TODO: consider and test removing the delta rewards
+        delta_score = next_observation["score"] - observation["score"]
+        # Level progression (0 or 1)
+        d_level = next_observation["curr_level"] - observation["curr_level"]
+        # Penalize for lost lives
+        reward -= (delta_lives * 10)
+        # Reward for score increase (delta_score is at index 5)
+        reward += (delta_score * 0.5)
+        # Reward for level progression (level_prog is at index 6)
+        reward += (d_level * 2)
+        return reward
 
-    def is_truncated(self, observation):
-        """Determine if the episode is truncated based on step count."""
-        return self.step_count >= self.max_steps  # or observation["curr_level"] >= self.max_level # can also truncate based on max level, TEST
+    # TODO consider adding bullets in screen and max bullets in screen at any time
 
     def get_observation(self):
         """Get the current state of the game as an observation."""
@@ -151,72 +179,31 @@ class GalacticGuardianEnv:
                                          dtype=np.float32)
         return processed_observation
 
-    def calculate_reward(self, observation, next_observation):
-        """Calculate the reward based on the change in score and other factors."""
-        reward = 0
-        if not self.is_done():
-            reward += 1  # Reward for surviving each step
-        else:
-            reward -= 50  # Penalty for losing the game
-        # Loss in remaining lives (0 or 1)
-        delta_lives = observation["remaining_lives"] - \
-            next_observation["remaining_lives"]
-        # Change in score (delta_score)
-        # TODO: consider and test removing the delta rewards
-        delta_score = next_observation["score"] - observation["score"]
-        # Level progression (0 or 1)
-        d_level = next_observation["curr_level"] - observation["curr_level"]
-        # Penalize for lost lives
-        reward -= (delta_lives * 10)
-        # Reward for score increase (delta_score is at index 5)
-        reward += (delta_score * 0.5)
-        # Reward for level progression (level_prog is at index 6)
-        reward += (d_level * 2)
-        return reward
+    def _is_done(self):
+        """Determine if the episode is done based on the observation."""
+        return not self.gg_game.active_gameplay
 
+    def _is_truncated(self, observation):
+        """Determine if the episode is truncated based on step count."""
+        return self.step_count >= self.max_steps  # or observation["curr_level"] >= self.max_level # can also truncate based on max level, TEST
 
-if __name__ == "__main__":
-    # env = GalacticGuardianEnv(mode="RL")
-    # raw_obs = env.get_observation()
-    # print("Raw Observation:", raw_obs)
-    # processed_obs = env.process_observation(raw_obs)
-    # print("Processed Observation:", processed_obs)
+    def _logger(self, env_info, freq=60, to_file=False):
+        """A simple logger to print the environment information."""
+        if self.step_count % freq == 0:
+            proc_env_info = self.process_observation(env_info)
 
-    env = GalacticGuardianEnv(mode="RL")
+            rem_lives, tot_lives = env_info["remaining_lives"], env_info["total_lives"]
+            cur_level, tot_levels = env_info["curr_level"], self.max_level
+            ship_x, ship_y = env_info["ship_center_x"], env_info["ship_center_y"]
+            delta_score, total_score = proc_env_info[5], env_info["score"]
 
-    num_episodes = 3
-    action_space_n = 6  # actions 0..5 based on your gg_game.act()
-
-    for ep in range(num_episodes):
-        obs, info = env.reset()
-        assert isinstance(obs, np.ndarray), "obs is not numpy array"
-        assert obs.dtype == np.float32, f"obs dtype is {obs.dtype}, expected float32"
-
-        ep_return = 0.0
-        ep_len = 0
-
-        terminated = False
-        truncated = False
-
-        while not (terminated or truncated):
-            action = np.random.randint(action_space_n)
-
-            next_obs, reward, terminated, truncated, info = env.step(action)
-
-            # basic sanity checks
-            assert isinstance(next_obs, np.ndarray)
-            assert next_obs.shape == obs.shape, f"obs shape changed: {obs.shape} -> {next_obs.shape}"
-            assert np.isfinite(reward), f"non-finite reward: {reward}"
-
-            ep_return += float(reward)
-            ep_len += 1
-            obs = next_obs
-
-        # pull final raw state for debugging
-        final_raw = env.get_observation()
-        print(
-            f"Episode {ep+1}: len={ep_len}, return={ep_return:.2f}, "
-            f"terminated={terminated}, truncated={truncated}, "
-            f"final_score={final_raw['score']}, lives={final_raw['remaining_lives']}, level={final_raw['curr_level']}"
-        )
-        print(env.process_observation(final_raw)[:10])
+            message = f"""
+{"*" * 70}
+Life {rem_lives}/{tot_lives}\t\tLevel {cur_level}/{tot_levels}
+Ship Pos: ({ship_x}, {ship_y})\t\tDelta Score: {delta_score}\t\tTotal Score: {total_score}
+""".strip() + "\n"
+            if to_file:  # Optionally save the log to a file
+                path = Path(__file__).resolve().parent / "logs" / "runstats.txt"
+                with open(path, "a") as f:
+                    f.write(message)
+            print(message)

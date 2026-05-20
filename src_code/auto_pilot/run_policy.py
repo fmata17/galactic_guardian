@@ -1,0 +1,103 @@
+import time
+import argparse
+from pathlib import Path
+from src_code.auto_pilot.gg_env import GalacticGuardianEnv
+from src_code.auto_pilot.policies.random_policy import RandomPolicy
+
+
+def _parse_args():
+    """Parse command-line arguments for running different policies easily."""
+    parser = argparse.ArgumentParser(
+        description="Run a policy in the Galactic Guardian environment.")
+    parser.add_argument("--policy", type=str, default="random",
+                        help="Type of policy to run (default: random)")
+    parser.add_argument("--num_episodes", type=int, default=10,
+                        help="Number of episodes to run (default: 10)")
+    return parser.parse_args()
+
+
+def _get_policy(policy_type: str):
+    """Return an instance of the specified policy type."""
+    if policy_type == "random":
+        return RandomPolicy()
+    # easy to extend later:
+    # elif policy_type == "greedy":
+    #     return GreedyPolicy()
+    else:
+        raise ValueError(f"Unknown policy type: '{policy_type}'")
+
+
+def _logger(run_info, to_file=False, last=False):
+    """A simple logger to print and possibly save the observations and run information."""
+    # Extract run information
+    episode, episodes = run_info["episode"], run_info["episodes"]
+    steps = run_info["steps"]
+    episode_reward, total_reward = run_info["episode_reward"], run_info["total_reward"]
+    run_id = run_info.get("run_id", "N/A")
+
+    message = f"""
+{"-" * 100}
+Episode: {episode + 1}\t\tEpisode Steps: {steps}\t\tEpisode Reward: {episode_reward}\t\tTotal Reward Accumulated: {total_reward}
+{"-" * 100}
+""".strip() + "\n" if not last else f"""
+{"-" * 65}
+Total Reward: {total_reward}\t\tAverage Reward per Episode: {total_reward / episodes}\t\tRun ID: {run_id}
+{"-" * 65}
+""".strip() + "\n"
+    if to_file:  # Optionally save the log to a file
+        path = Path(__file__).resolve().parent / "logs" / "runstats.txt"
+        with open(path, "a") as f:
+            f.write(message)
+    print(message)
+
+
+def run_policy(policy, env, num_episodes=10):
+    """Run a given policy in the environment for a specified number of episodes."""
+    run_id = time.strftime("%Y%m%d_%H%M%S")
+    total_reward = 0
+    for episode in range(num_episodes):
+        # Reset the environment at the start of each episode
+        observation, info = env.reset()
+        terminated = False
+        truncated = False
+        episode_reward = 0
+        episode_steps = 0
+
+        while not terminated and not truncated:
+            episode_steps += 1
+            action_id = policy.select_action(
+                observation)  # Get action from the policy
+            next_observation, reward, terminated, truncated, info = env.step(
+                action_id)  # Take action in the environment
+            episode_reward += reward  # Accumulate reward
+            total_reward += reward
+
+            observation = next_observation  # Update observation for the next step
+
+        # Log episode information after each episode
+        run_info = {
+            "episode": episode,
+            "episodes": num_episodes,
+            "steps": episode_steps,
+            "episode_reward": episode_reward,
+            "total_reward": total_reward
+        }
+        _logger(run_info, to_file=True, last=False)
+
+    # Log final run information
+    run_info = {
+        "episode": None,
+        "episodes": num_episodes,
+        "steps": None,
+        "episode_reward": None,
+        "total_reward": total_reward,
+        "run_id": run_id
+    }
+    _logger(run_info, to_file=True, last=True)
+
+
+if __name__ == "__main__":
+    args = _parse_args()
+    policy = _get_policy(args.policy)
+    env = GalacticGuardianEnv(mode="RL")
+    run_policy(policy, env, num_episodes=args.num_episodes)
