@@ -3,6 +3,7 @@ import argparse
 from pathlib import Path
 from src_code.auto_pilot.gg_env import GalacticGuardianEnv
 from src_code.auto_pilot.policies.random_policy import RandomPolicy
+from src_code.auto_pilot.policies.nearest_policy import NearestPolicy
 
 
 def _parse_args():
@@ -13,6 +14,8 @@ def _parse_args():
                         help="Type of policy to run (default: random)")
     parser.add_argument("--num_episodes", type=int, default=10,
                         help="Number of episodes to run (default: 10)")
+    parser.add_argument("--mode", type=str, default="RL",
+                        help="Environment mode (default: RL) - can be 'RL' or 'human')")
     return parser.parse_args()
 
 
@@ -20,9 +23,8 @@ def _get_policy(policy_type: str):
     """Return an instance of the specified policy type."""
     if policy_type == "random":
         return RandomPolicy()
-    # easy to extend later:
-    # elif policy_type == "greedy":
-    #     return GreedyPolicy()
+    elif policy_type == "nearest":
+        return NearestPolicy()
     else:
         raise ValueError(f"Unknown policy type: '{policy_type}'")
 
@@ -99,5 +101,5 @@ def run_policy(policy, env, num_episodes=10):
 if __name__ == "__main__":
     args = _parse_args()
     policy = _get_policy(args.policy)
-    env = GalacticGuardianEnv(mode="RL")
+    env = GalacticGuardianEnv(mode=args.mode)
     run_policy(policy, env, num_episodes=args.num_episodes)

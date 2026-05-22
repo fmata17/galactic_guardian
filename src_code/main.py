@@ -98,7 +98,7 @@ class GalacticGuardian:
             self._update_bullets()
             self._update_fleet()
 
-            # pygame.event.pump()  # process event queue to prevent freezing
+            pygame.event.pump()  # process event queue to prevent freezing
 
             if self.mode == "human":  # not needed for headless mode
                 self._update_screen()
@@ -302,14 +302,13 @@ class GalacticGuardian:
         # leave one alien's space above and next to each alien
         alien = Alien(self)
         alien_width, alien_height = alien.rect.size
-        self.aliens.add(alien)  # add the first alien to the group
         id = 0
 
         current_x, current_y = alien_width, alien_height
         while current_y < (self.settings.dummy_height - 4 * alien_height):
             while current_x < (self.settings.dummy_width - 2 * alien_width):
-                id += 1
                 self._create_alien(current_x, current_y, id)
+                id += 1
                 current_x += 2 * alien_width
 
             # finish a row; reset x value, and increment y value

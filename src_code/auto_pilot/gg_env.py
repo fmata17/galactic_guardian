@@ -13,7 +13,7 @@ class GalacticGuardianEnv:
         self.step_count = 0  # Track the number of steps taken in the current episode
 
         # Define a maximum number of steps per episode to prevent infinite episodes
-        self.max_steps = 3000
+        self.max_steps = 6000
         # Define a maximum level for the game simulation
         self.max_level = 10
 
@@ -87,9 +87,9 @@ class GalacticGuardianEnv:
         d_level = next_observation["curr_level"] - observation["curr_level"]
         # Penalize for lost lives
         reward -= (delta_lives * 10)
-        # Reward for score increase (delta_score is at index 5)
+        # Reward for score increase
         reward += (delta_score * 0.5)
-        # Reward for level progression (level_prog is at index 6)
+        # Reward for level progression
         reward += (d_level * 2)
         return reward
 
