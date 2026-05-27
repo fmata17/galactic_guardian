@@ -15,8 +15,8 @@ def _parse_args():
                         help="Type of policy to run (default: random)")
     parser.add_argument("--num_episodes", type=int, default=10,
                         help="Number of episodes to run (default: 10)")
-    parser.add_argument("--mode", type=str, default="RL",
-                        help="Environment mode (default: RL) - can be 'RL' or 'human')")
+    parser.add_argument("--mode", type=str, default="RL", choices=["RL", "human", "manual"],
+                        help="Environment mode (default: RL) - can be 'RL', 'human', or 'manual')")
     parser.add_argument("--model_path", type=str, default=None,
                         help="Path to the trained DQN model checkpoint (required if policy=dqn)")
     parser.add_argument("--device", type=str, default="cpu",
@@ -82,8 +82,21 @@ def run_policy(policy, env, num_episodes=10, mode="RL"):
         # Check if the game window is still open for graceful exit (env.gg_game.running)
         while not terminated and not truncated and env.gg_game.running:
             episode_steps += 1
-            action_id = policy.select_action(
-                observation)  # Get action from the policy
+            if mode == "manual":
+                while True:
+                    raw_action = input("Action id [0-5] (or 'q' to quit): ").strip().lower()
+                    if raw_action == "q":
+                        terminated = True
+                        break
+                    if raw_action.isdigit() and int(raw_action) in env.action_space:
+                        action_id = int(raw_action)
+                        break
+                    print("Invalid action. Enter a number between 0 and 5, or 'q'.")
+                if terminated:
+                    break
+            else:
+                action_id = policy.select_action(
+                    observation)  # Get action from the policy
             next_observation, reward, terminated, truncated, info = env.step(
                 action_id)  # Take action in the environment
             episode_reward += reward  # Accumulate reward
