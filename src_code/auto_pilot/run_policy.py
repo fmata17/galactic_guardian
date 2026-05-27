@@ -94,8 +94,11 @@ def run_policy(policy, env, num_episodes=10, mode="RL"):
                     if raw_action == "q":
                         terminated = True
                         break
-                    if raw_action.isdigit() and int(raw_action) in valid_actions:
+                    try:
                         action_id = int(raw_action)
+                    except ValueError:
+                        action_id = None
+                    if action_id in valid_actions:
                         break
                     print(
                         f"Invalid action. Enter a number between {action_min} and {action_max}, or 'q'.")
