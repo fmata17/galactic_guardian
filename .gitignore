@@ -4,6 +4,14 @@ __pycache__/
 .vscode/
 gg_venv/
 build/
+# environment variables to keep secrets
+.env 
 
 # highscore track is individual to each computer
 highscore.json
+
+# ignore run logs while training
+src_code/auto_pilot/logs/*
+
+# ignore trained models while training
+src_code/auto_pilot/policies/dqn/trained_models/*

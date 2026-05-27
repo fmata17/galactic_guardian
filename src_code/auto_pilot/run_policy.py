@@ -4,6 +4,7 @@ from pathlib import Path
 from src_code.auto_pilot.gg_env import GalacticGuardianEnv
 from src_code.auto_pilot.policies.random_policy import RandomPolicy
 from src_code.auto_pilot.policies.nearest_policy import NearestPolicy
+from src_code.auto_pilot.policies.dqn_policy import DQNPolicy, DQNPolicyConfig
 
 
 def _parse_args():
@@ -16,6 +17,10 @@ def _parse_args():
                         help="Number of episodes to run (default: 10)")
     parser.add_argument("--mode", type=str, default="RL",
                         help="Environment mode (default: RL) - can be 'RL' or 'human')")
+    parser.add_argument("--model_path", type=str, default=None,
+                        help="Path to the trained DQN model checkpoint (required if policy=dqn)")
+    parser.add_argument("--device", type=str, default="cpu",
+                        help="Device to run the DQN policy on (default: cpu)")
     return parser.parse_args()
 
 
@@ -25,6 +30,14 @@ def _get_policy(policy_type: str):
         return RandomPolicy()
     elif policy_type == "nearest":
         return NearestPolicy()
+    elif policy_type == "dqn":
+        if not args.model_path:
+            raise ValueError("--model_path is required for policy=dqn")
+        if args.device != "cuda":
+            if input(f"Warning: Running DQN on {args.device} may be slow. Continue? (y/n) ").lower() != "y":
+                print("Exiting.")
+                exit(0)
+        return DQNPolicy(DQNPolicyConfig(model_path=args.model_path, device=args.device))
     else:
         raise ValueError(f"Unknown policy type: '{policy_type}'")
 
@@ -48,12 +61,13 @@ Total Reward: {total_reward}\t\tAverage Reward per Episode: {total_reward / epis
 """.strip() + "\n"
     if to_file:  # Optionally save the log to a file
         path = Path(__file__).resolve().parent / "logs" / "runstats.txt"
+        path.parent.mkdir(parents=True, exist_ok=True)  # Ensure the logs directory exists
         with open(path, "a") as f:
             f.write(message)
     print(message)
 
 
-def run_policy(policy, env, num_episodes=10):
+def run_policy(policy, env, num_episodes=10, mode="RL"):
     """Run a given policy in the environment for a specified number of episodes."""
     run_id = time.strftime("%Y%m%d_%H%M%S")
     total_reward = 0
@@ -65,7 +79,8 @@ def run_policy(policy, env, num_episodes=10):
         episode_reward = 0
         episode_steps = 0
 
-        while not terminated and not truncated:
+        # Check if the game window is still open for graceful exit (env.gg_game.running)
+        while not terminated and not truncated and env.gg_game.running:
             episode_steps += 1
             action_id = policy.select_action(
                 observation)  # Get action from the policy
@@ -75,6 +90,9 @@ def run_policy(policy, env, num_episodes=10):
             total_reward += reward
 
             observation = next_observation  # Update observation for the next step
+            if mode == "human":
+                # Sleep briefly to slow down the loop for better visualization
+                time.sleep(0.01)
 
         # Log episode information after each episode
         run_info = {
@@ -84,7 +102,7 @@ def run_policy(policy, env, num_episodes=10):
             "episode_reward": episode_reward,
             "total_reward": total_reward
         }
-        _logger(run_info, to_file=True, last=False)
+        _logger(run_info, to_file=False, last=False)
 
     # Log final run information
     run_info = {
@@ -95,11 +113,11 @@ def run_policy(policy, env, num_episodes=10):
         "total_reward": total_reward,
         "run_id": run_id
     }
-    _logger(run_info, to_file=True, last=True)
+    _logger(run_info, to_file=False, last=True)
 
 
 if __name__ == "__main__":
     args = _parse_args()
     policy = _get_policy(args.policy)
     env = GalacticGuardianEnv(mode=args.mode)
-    run_policy(policy, env, num_episodes=args.num_episodes)
+    run_policy(policy, env, num_episodes=args.num_episodes, mode=args.mode)

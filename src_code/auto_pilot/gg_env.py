@@ -10,6 +10,8 @@ class GalacticGuardianEnv:
     def __init__(self, mode="RL"):
         """Initialize the environment and the game."""
         self.mode = mode
+        self.gg_game = GalacticGuardian(mode=self.mode)
+
         self.step_count = 0  # Track the number of steps taken in the current episode
 
         # Define a maximum number of steps per episode to prevent infinite episodes
@@ -17,7 +19,8 @@ class GalacticGuardianEnv:
         # Define a maximum level for the game simulation
         self.max_level = 10
 
-        self.gg_game = GalacticGuardian(mode=self.mode)
+        # Track the previous score to calculate delta_score for reward calculation
+        self.prev_score = 0
 
         self.action_space = [0,  # do nothing
                              1,  # move right
@@ -29,6 +32,11 @@ class GalacticGuardianEnv:
     def step(self, action_id=0):
         """Take an action in the environment and return the new observation, reward, done flag, and info."""
         if self.gg_game.active_gameplay:
+            # ERASE ME: USED FOR DEBUGGING AND TESTING ACTION LIMITS, CONDITIONAL TEST
+            # if action_id in [3, 4, 5] and len(self.gg_game.bullets) >= self.gg_game.settings.bullets_allowed:
+            #     print(
+            #         "Bullet limit reached! Cannot fire more bullets until some are off the screen.")
+
             self.step_count += 1  # Increment step count
 
             # Get the current observation before taking the action
@@ -43,20 +51,23 @@ class GalacticGuardianEnv:
             # Get the next observation
             next_observation = self.get_observation()
             next_observation_processed = self.process_observation(
-                next_observation, score_before=observation["score"])
-
-            reward = self.calculate_reward(
-                observation, next_observation)  # Calculate reward
-
+                next_observation)
             terminated = self._is_done()  # Check if game is over
             # Check if episode is truncated
-            truncated = self._is_truncated(next_observation)
+            truncated = self._is_truncated()
+
+            reward = self.calculate_reward(
+                # Calculate reward
+                observation, next_observation, (terminated or truncated))
 
             # Get additional info and metadata
             info = {"step_count": self.step_count}
-            
+
             # Log the environment information at regular intervals
-            self._logger(next_observation, freq=180, to_file=True)
+            self._logger(next_observation, freq=180, to_file=False)
+            # Update previous score for the next step's delta_score calculation after logging
+            #   to ensure the logged delta_score corresponds to the current step's reward calculation
+            self.prev_score = next_observation["score"]
 
             return next_observation_processed, reward, terminated, truncated, info
         else:
@@ -68,15 +79,16 @@ class GalacticGuardianEnv:
         self.step_count = 0  # Reset step count for the new episode
         observation = self.get_observation()
         info = {"step_count": self.step_count}
+        # set previous score to the initial score after reset for correct delta_score calculation in the first step
+        self.prev_score = observation["score"]
         return self.process_observation(observation), info
 
-    def calculate_reward(self, observation, next_observation):
+    # NOTE reward calculation is the single most critical component for a successful training
+    # this is what signals the model WHAT to learn and HOW to learn it
+    def calculate_reward(self, observation, next_observation, done):
         """Calculate the reward based on the change in score and other factors."""
-        reward = 0
-        if not self._is_done():
-            reward += 1  # Reward for surviving each step
-        else:
-            reward -= 50  # Penalty for losing the game
+        # Base reward for surviving a step or penalty for episode termination
+        reward = 0.1 if not done else -500.0
         # Loss in remaining lives (0 or 1)
         delta_lives = observation["remaining_lives"] - \
             next_observation["remaining_lives"]
@@ -86,11 +98,13 @@ class GalacticGuardianEnv:
         # Level progression (0 or 1)
         d_level = next_observation["curr_level"] - observation["curr_level"]
         # Penalize for lost lives
-        reward -= (delta_lives * 10)
+        reward -= (delta_lives * 100.0)
         # Reward for score increase
-        reward += (delta_score * 0.5)
+        reward += (delta_score * 10.0)
         # Reward for level progression
-        reward += (d_level * 2)
+        # 100 # not reached very often during training,
+        reward += (d_level * 5000.0)
+        # ATTEMPT: bigger reward for level progression to encourage it more, TEST
         return reward
 
     # TODO consider adding bullets in screen and max bullets in screen at any time
@@ -109,6 +123,7 @@ class GalacticGuardianEnv:
             "world_height": self.gg_game.settings.dummy_height,
             "score": self.gg_game.stats.score,
             "curr_level": self.gg_game.stats.level,
+            "bullet_count": len(self.gg_game.bullets)
         }
 
         # Add aliens info
@@ -132,14 +147,14 @@ class GalacticGuardianEnv:
                 })
         return observation
 
-    def process_observation(self, observation, score_before=0):
+    def process_observation(self, observation):
         """
         Process the raw observation into a format suitable for the agent.
         Observation vector includes:
-        [remaining_lives_std,       ship_center_x_std,      ship_center_y_std,      ship_width_std,
-         ship_height_std,           delta_score,                level_prog,             alien_0_center_x_std,
-         alien_0_center_y_std,      alien_0_width_std,      alien_0_height_std, ...,
-         alien_N_center_x_std,      alien_N_center_y_std,   alien_N_width_std,      alien_N_height_std]
+        [remaining_lives_std,       ship_center_x_std,          ship_center_y_std,      ship_width_std,
+         ship_height_std,           delta_score,                level_prog,             bullet_count_std,
+         alien_0_center_x_std,      alien_0_center_y_std,       alien_0_width_std,      alien_0_height_std, ...,
+         alien_N_center_x_std,      alien_N_center_y_std,       alien_N_width_std,      alien_N_height_std]
         """
         remaining_lives_std = observation["remaining_lives"] / \
             observation["total_lives"]
@@ -156,10 +171,13 @@ class GalacticGuardianEnv:
         ship_height_std = observation["ship_height"] / \
             observation["world_height"]
 
-        delta_score = observation["score"] - score_before
+        delta_score = observation["score"] - self.prev_score
 
         level_prog = min(observation["curr_level"],
                          self.max_level) / self.max_level
+
+        bullet_count_std = observation["bullet_count"] / \
+            self.gg_game.settings.bullets_allowed
 
         aliens = []
         for i in range(self.gg_game.initial_alien_count):
@@ -175,7 +193,7 @@ class GalacticGuardianEnv:
                            alien_width_std, alien_height_std])
 
         processed_observation = np.array([remaining_lives_std, ship_center_x_std, ship_center_y_std,
-                                          ship_width_std, ship_height_std, delta_score, level_prog] + aliens,
+                                          ship_width_std, ship_height_std, delta_score, level_prog, bullet_count_std] + aliens,
                                          dtype=np.float32)
         return processed_observation
 
@@ -183,27 +201,32 @@ class GalacticGuardianEnv:
         """Determine if the episode is done based on the observation."""
         return not self.gg_game.active_gameplay
 
-    def _is_truncated(self, observation):
+    def _is_truncated(self):
         """Determine if the episode is truncated based on step count."""
         return self.step_count >= self.max_steps  # or observation["curr_level"] >= self.max_level # can also truncate based on max level, TEST
 
     def _logger(self, env_info, freq=60, to_file=False):
         """A simple logger to print the environment information."""
         if self.step_count % freq == 0:
-            proc_env_info = self.process_observation(env_info)
+            proc_env_info = self.process_observation(
+                env_info)
 
             rem_lives, tot_lives = env_info["remaining_lives"], env_info["total_lives"]
             cur_level, tot_levels = env_info["curr_level"], self.max_level
             ship_x, ship_y = env_info["ship_center_x"], env_info["ship_center_y"]
             delta_score, total_score = proc_env_info[5], env_info["score"]
+            bullet_count = env_info["bullet_count"]
 
             message = f"""
 {"*" * 70}
-Life {rem_lives}/{tot_lives}\t\tLevel {cur_level}/{tot_levels}
+Life {rem_lives}/{tot_lives}\t\tLevel {cur_level}/{tot_levels}\t\tBullets in Air: {bullet_count}/ {self.gg_game.settings.bullets_allowed}
 Ship Pos: ({ship_x}, {ship_y})\t\tDelta Score: {delta_score}\t\tTotal Score: {total_score}
 """.strip() + "\n"
             if to_file:  # Optionally save the log to a file
-                path = Path(__file__).resolve().parent / "logs" / "runstats.txt"
+                path = Path(__file__).resolve().parent / \
+                    "logs" / "runstats.txt"
+                # Ensure the logs directory exists
+                path.parent.mkdir(parents=True, exist_ok=True)
                 with open(path, "a") as f:
                     f.write(message)
             print(message)

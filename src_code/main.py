@@ -98,10 +98,20 @@ class GalacticGuardian:
             self._update_bullets()
             self._update_fleet()
 
-            pygame.event.pump()  # process event queue to prevent freezing
+            # allow event processing for human mode to prevent freezing and enable quitting
+            if self.mode == "human":  
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        self.running = False
+                        self._graceful_exit()
+                    elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                        self.running = False
+                        self._graceful_exit()
 
-            if self.mode == "human":  # not needed for headless mode
                 self._update_screen()
+            # pump events for non-human mode to prevent freezing
+            else:
+                pygame.event.pump()
 
     def act(self, action_id):
         """Perform the action corresponding to the given action_id."""
@@ -149,6 +159,12 @@ class GalacticGuardian:
         self.act(0)
 
         self.active_gameplay = True
+
+    def _graceful_exit(self):
+        """Gracefully exit the game."""
+        pygame.mixer.music.stop()
+        pygame.quit()
+        sys.exit()
 
     def _convert_mouse_pos(self):
         """Convert mouse position of screen to the positions on the dummy surface."""
