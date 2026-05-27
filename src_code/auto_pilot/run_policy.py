@@ -71,6 +71,11 @@ def run_policy(policy, env, num_episodes=10, mode="RL"):
     """Run a given policy in the environment for a specified number of episodes."""
     run_id = time.strftime("%Y%m%d_%H%M%S")
     total_reward = 0
+    if hasattr(env.action_space, "n"):
+        valid_actions = list(range(env.action_space.n))
+    else:
+        valid_actions = list(env.action_space)
+    action_min, action_max = min(valid_actions), max(valid_actions)
     for episode in range(num_episodes):
         # Reset the environment at the start of each episode
         observation, info = env.reset()
@@ -84,14 +89,16 @@ def run_policy(policy, env, num_episodes=10, mode="RL"):
             episode_steps += 1
             if mode == "manual":
                 while True:
-                    raw_action = input("Action id [0-5] (or 'q' to quit): ").strip().lower()
+                    raw_action = input(
+                        f"Action id [{action_min}-{action_max}] (or 'q' to quit): ").strip().lower()
                     if raw_action == "q":
                         terminated = True
                         break
-                    if raw_action.isdigit() and int(raw_action) in env.action_space:
+                    if raw_action.isdigit() and int(raw_action) in valid_actions:
                         action_id = int(raw_action)
                         break
-                    print("Invalid action. Enter a number between 0 and 5, or 'q'.")
+                    print(
+                        f"Invalid action. Enter a number between {action_min} and {action_max}, or 'q'.")
                 if terminated:
                     break
             else:
