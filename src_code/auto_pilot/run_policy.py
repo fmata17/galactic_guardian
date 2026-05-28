@@ -15,8 +15,8 @@ def _parse_args():
                         help="Type of policy to run (default: random)")
     parser.add_argument("--num_episodes", type=int, default=10,
                         help="Number of episodes to run (default: 10)")
-    parser.add_argument("--mode", type=str, default="RL",
-                        help="Environment mode (default: RL) - can be 'RL' or 'human')")
+    parser.add_argument("--mode", type=str, default="RL", choices=["RL", "human", "manual"],
+                        help="Environment mode (default: RL) - can be 'RL', 'human', or 'manual')")
     parser.add_argument("--model_path", type=str, default=None,
                         help="Path to the trained DQN model checkpoint (required if policy=dqn)")
     parser.add_argument("--device", type=str, default="cpu",
@@ -71,6 +71,11 @@ def run_policy(policy, env, num_episodes=10, mode="RL"):
     """Run a given policy in the environment for a specified number of episodes."""
     run_id = time.strftime("%Y%m%d_%H%M%S")
     total_reward = 0
+    if hasattr(env.action_space, "n"):
+        valid_actions = list(range(env.action_space.n))
+    else:
+        valid_actions = list(env.action_space)
+    action_min, action_max = min(valid_actions), max(valid_actions)
     for episode in range(num_episodes):
         # Reset the environment at the start of each episode
         observation, info = env.reset()
@@ -82,8 +87,26 @@ def run_policy(policy, env, num_episodes=10, mode="RL"):
         # Check if the game window is still open for graceful exit (env.gg_game.running)
         while not terminated and not truncated and env.gg_game.running:
             episode_steps += 1
-            action_id = policy.select_action(
-                observation)  # Get action from the policy
+            if mode == "manual":
+                while True:
+                    raw_action = input(
+                        f"Action id [{action_min}-{action_max}] (or 'q' to quit): ").strip().lower()
+                    if raw_action == "q":
+                        terminated = True
+                        break
+                    try:
+                        action_id = int(raw_action)
+                    except ValueError:
+                        action_id = None
+                    if action_id in valid_actions:
+                        break
+                    print(
+                        f"Invalid action. Enter a number between {action_min} and {action_max}, or 'q'.")
+                if terminated:
+                    break
+            else:
+                action_id = policy.select_action(
+                    observation)  # Get action from the policy
             next_observation, reward, terminated, truncated, info = env.step(
                 action_id)  # Take action in the environment
             episode_reward += reward  # Accumulate reward
