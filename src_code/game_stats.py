@@ -1,9 +1,10 @@
-from pathlib import Path
 import json
+from pathlib import Path
 
 
 class GameStats:
     """Track statistics for Galactic Guardian."""
+
     def __init__(self, gg_game):
         """Initialize statistics."""
         self.settings = gg_game.settings

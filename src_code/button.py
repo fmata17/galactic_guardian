@@ -3,6 +3,7 @@ import pygame.font
 
 class Button:
     """A class to build buttons for the game."""
+
     def __init__(self, gg_game, msg):
         """Initialize the button's attributes."""
         self.screen = gg_game.dummy_screen

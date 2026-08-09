@@ -4,6 +4,7 @@ from pygame.sprite import Sprite
 
 class Spaceship(Sprite):
     """A class to manage the spaceship 'Moon Marauder'."""
+
     def __init__(self, gg_game, *groups):
         """Initialize the spaceship and its starting position."""
         super().__init__(*groups)
@@ -13,11 +14,14 @@ class Spaceship(Sprite):
         self.settings = gg_game.settings
 
         # loads ship image and gets its screen space
-        self.image = pygame.image.load('src_code/resources/spaceship.png')
+        self.image = pygame.image.load("src_code/resources/spaceship.png")
         self.rect = self.image.get_rect()
 
         # starts each new ship at the bottom center of the screen
-        self.rect.midbottom = (self.screen_rect.midbottom[0], (self.screen_rect.midbottom[1] - 10))
+        self.rect.midbottom = (
+            self.screen_rect.midbottom[0],
+            (self.screen_rect.midbottom[1] - 10),
+        )
 
         # store a float for the ships exact horizontal position because if not specified, rect object only run integers
         self.x = float(self.rect.x)
@@ -28,7 +32,10 @@ class Spaceship(Sprite):
 
     def center_spaceship(self):
         """Center the spaceship on the screen."""
-        self.rect.midbottom = (self.screen_rect.midbottom[0], (self.screen_rect.midbottom[1] - 10))
+        self.rect.midbottom = (
+            self.screen_rect.midbottom[0],
+            (self.screen_rect.midbottom[1] - 10),
+        )
         self.x = float(self.rect.x)
 
     def update(self):

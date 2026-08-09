@@ -4,6 +4,7 @@ from pygame.sprite import Sprite
 
 class Alien(Sprite):
     """A class to represent a single alien in the fleet."""
+
     def __init__(self, gg_game):
         """Initialize the alien and set its initial position."""
         super().__init__()
@@ -11,7 +12,7 @@ class Alien(Sprite):
         self.settings = gg_game.settings
 
         # load the alien image and set its rect attribute
-        self.pre_image = pygame.image.load('src_code/resources/alien.png')
+        self.pre_image = pygame.image.load("src_code/resources/alien.png")
         self.image = pygame.transform.scale(self.pre_image, (147, 76))
         self.rect = self.image.get_rect()
 

@@ -1,15 +1,16 @@
 import asyncio
-import pygame
 import sys
 from time import sleep
-from settings import Settings
-from music import Music
-from game_stats import GameStats
-from scoreboard import Scoreboard
-from button import Button
-from spaceship import Spaceship
-from bullet import Bullet
+
+import pygame
 from alien import Alien
+from bullet import Bullet
+from button import Button
+from game_stats import GameStats
+from music import Music
+from scoreboard import Scoreboard
+from settings import Settings
+from spaceship import Spaceship
 
 
 class GalacticGuardian:
@@ -29,16 +30,19 @@ class GalacticGuardian:
 
         # load music, set volume, and play from the beginning of the program
         pygame.mixer.music.load(
-            "src_code/resources/stardust_danijel_zambo_background.ogg")
+            "src_code/resources/stardust_danijel_zambo_background.ogg"
+        )
         pygame.mixer.music.set_volume(0.8)
         pygame.mixer.music.play(loops=-1)
 
         # do not use SCALED nor vsync flags for webassembly, they are causing bugs
-        self.screen = pygame.display.set_mode((self.settings.screen_width,
-                                               self.settings.screen_height), pygame.FULLSCREEN)
+        self.screen = pygame.display.set_mode(
+            (self.settings.screen_width, self.settings.screen_height), pygame.FULLSCREEN
+        )
 
-        self.dummy_screen = pygame.Surface((self.settings.dummy_width,
-                                            self.settings.dummy_height))
+        self.dummy_screen = pygame.Surface(
+            (self.settings.dummy_width, self.settings.dummy_height)
+        )
 
         pygame.display.set_caption("Galactic Guardian")
 
@@ -83,10 +87,8 @@ class GalacticGuardian:
 
     def _convert_mouse_pos(self):
         """Convert mouse position of screen to the positions on the dummy surface."""
-        scale_factor_x = self.screen.get_size(
-        )[0] / self.dummy_screen.get_size()[0]
-        scale_factor_y = self.screen.get_size(
-        )[1] / self.dummy_screen.get_size()[1]
+        scale_factor_x = self.screen.get_size()[0] / self.dummy_screen.get_size()[0]
+        scale_factor_y = self.screen.get_size()[1] / self.dummy_screen.get_size()[1]
         # different scale factors for each coordinate to ensure adequate scaling even
         # on different aspect ratios than the one of the dummy surface
         mouse_pos = pygame.mouse.get_pos()
@@ -196,8 +198,7 @@ class GalacticGuardian:
     def _check_bullet_alien_collision(self):
         """Checks if the bullets collide with the aliens and respond appropriately."""
         # check for any bullets that have hit an alien and get rid of both, the bullet and alien
-        collisions = pygame.sprite.groupcollide(
-            self.bullets, self.aliens, True, True)
+        collisions = pygame.sprite.groupcollide(self.bullets, self.aliens, True, True)
 
         if collisions:
             for aliens in collisions.values():
@@ -248,7 +249,7 @@ class GalacticGuardian:
         self._check_fleet_edges()
         self.aliens.update()
 
-        if pygame.sprite.spritecollideany(self.spaceship, self.aliens): # type: ignore[arg-type]
+        if pygame.sprite.spritecollideany(self.spaceship, self.aliens):  # type: ignore[arg-type]
             self._ship_hit()
 
         # look for aliens hitting the bottom of the screen
@@ -325,9 +326,9 @@ class GalacticGuardian:
             self.hard_button.draw_button()
 
         # scale dummy surface
-        scaled_dummy_screen = pygame.transform.scale(self.dummy_screen,
-                                                     (self.settings.screen_width,
-                                                      self.settings.screen_height))
+        scaled_dummy_screen = pygame.transform.scale(
+            self.dummy_screen, (self.settings.screen_width, self.settings.screen_height)
+        )
 
         # blit scaled surface to main surface
         self.screen.blit(scaled_dummy_screen, (0, 0))

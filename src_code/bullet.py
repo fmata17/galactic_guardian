@@ -4,6 +4,7 @@ from pygame.sprite import Sprite
 
 class Bullet(Sprite):
     """A class to represent a bullet fired from the spaceship."""
+
     def __init__(self, gg_game):
         """Create a bullet object at the spaceship's current location."""
         super().__init__()
@@ -12,7 +13,9 @@ class Bullet(Sprite):
         self.color = gg_game.settings.bullet_color
 
         # create a bullet rect at the ship's current position.
-        self.rect = pygame.Rect(0, 0, self.settings.bullet_width, self.settings.bullet_height)
+        self.rect = pygame.Rect(
+            0, 0, self.settings.bullet_width, self.settings.bullet_height
+        )
         self.rect.midtop = gg_game.spaceship.rect.midtop
 
         # store the bullet's position as a float.

@@ -4,6 +4,7 @@ import pygame
 # noinspection PyAttributeOutsideInit
 class Settings:
     """A class to define all settings for Galactic Guardian."""
+
     def __init__(self):
         """Initializes the game's static settings for other modules."""
         # get the screen size for each user's main monitor
